@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OEE System - Overall Equipment Effectiveness</title>
+    <title>PT DEF - Digital Monitoring OEE & Utility</title>
     <style>
         * {
             margin: 0;
@@ -18,16 +18,15 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
-        /* Header & Navigasi */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
@@ -39,666 +38,646 @@
             font-size: 24px;
         }
 
-        .nav-tabs {
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .tabs {
             display: flex;
             gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
         .tab-btn {
-            background: rgba(255,255,255,0.2);
+            padding: 12px 24px;
+            background: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: white;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .tab-btn.active {
-            background: white;
-            color: #667eea;
+            background: #2a5298;
+            color: white;
         }
 
         .tab-btn:hover {
-            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .stat-card .value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        /* Filter Bar */
-        .filter-bar {
-            padding: 15px;
-            background: #f8f9fa;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .filter-bar input, .filter-bar select {
-            width: auto;
-            min-width: 150px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        /* Tables */
-        .data-table {
-            background: white;
-            border-radius: 10px;
-            overflow-x: auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        th, td {
-            padding: 10px 8px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background: #667eea;
-            color: white;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-        }
-
-        tr:hover {
-            background: #f5f5f5;
-        }
-
-        /* Forms */
-        .form-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
-        }
-
-        button.danger {
-            background: #dc3545;
-        }
-
-        button.success {
-            background: #28a745;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        /* Tab Content */
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        /* Badges */
-        .badge {
-            padding: 4px 8px;
-            border-radius: 5px;
-            font-size: 11px;
-            font-weight: bold;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .badge-high {
-            background: #d4edda;
-            color: #155724;
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .badge-medium {
-            background: #fff3cd;
-            color: #856404;
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1e3c72;
+            border-left: 4px solid #2a5298;
+            padding-left: 12px;
         }
 
-        .badge-low {
-            background: #f8d7da;
-            color: #721c24;
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
 
-        .action-btn {
-            background: none;
-            padding: 5px 10px;
-            margin: 0 2px;
-            font-size: 12px;
-        }
-
-        .jumlah-data {
-            padding: 10px 15px;
-            background: #e9ecef;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        .header-info {
+        .form-group {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn-submit {
+            background: #2a5298;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .btn-submit:hover {
+            background: #1e3c72;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-card.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .data-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
             border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 15px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2a5298;
+        }
+
+        .periode-range {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .input-subnav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .input-subnav button {
+            background: #e9ecef;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .input-subnav button.active {
+            background: #2a5298;
+            color: white;
+        }
+
+        .input-panel {
+            display: none;
+        }
+
+        .input-panel.active {
+            display: block;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>🏭 OEE System - Overall Equipment Effectiveness</h1>
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab('dashboard', this)">📊 Dashboard</button>
-            <button class="tab-btn" onclick="showTab('input', this)">📝 Input OEE</button>
-            <button class="tab-btn" onclick="showTab('mesin', this)">⚙️ Kelola Mesin</button>
-            <button class="tab-btn" onclick="showTab('audit', this)">📜 Audit Trail</button>
+        <h1>🏭 PT DEF - Digital Monitoring System</h1>
+        <div class="badge">📅 OEE Harian | ⚡ Listrik | 💧 PAM | 📊 Dashboard</div>
+    </div>
+
+    <!-- MAIN NAVIGATION -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('dashboard')">📊 DASHBOARD</button>
+        <button class="tab-btn" onclick="switchTab('input')">📝 INPUT</button>
+        <button class="tab-btn" onclick="switchTab('management')">⚙️ MANAGEMENT</button>
+        <button class="tab-btn" onclick="switchTab('audit')">📜 AUDIT TRAIL</button>
+    </div>
+
+    <!-- ==================== TAB DASHBOARD ==================== -->
+    <div id="tab-dashboard" class="tab-content active">
+        <div class="stats-grid" id="oeeStats"></div>
+        <div class="card">
+            <div class="card-title">📊 Tren OEE (10 hari terakhir)</div>
+            <div class="data-table" id="oeeChart"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">⚡ Listrik vs Produksi</div>
+            <div class="data-table" id="listrikVsProduksi"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">💧 Pemakaian Air per Periode</div>
+            <div class="data-table" id="pamChart"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">📈 Ringkasan Kinerja Bulanan</div>
+            <div class="data-table" id="ringkasanBulanan"></div>
         </div>
     </div>
 
-    <!-- ==================== TAB 1: DASHBOARD ==================== -->
-    <div id="dashboard" class="tab-content active">
-        <div class="stats-grid" id="statsGrid"></div>
-        
-        <div class="filter-bar">
-            <input type="text" id="filterProduk" placeholder="Filter Produk" onkeyup="renderOEETable()">
-            <input type="date" id="filterTanggalMulai" onchange="renderOEETable()">
-            <input type="date" id="filterTanggalSelesai" onchange="renderOEETable()">
-            <select id="filterLine" onchange="renderOEETable()">
-                <option value="">Semua Line</option>
-            </select>
-            <button onclick="resetFilter()">Reset Filter</button>
+    <!-- ==================== TAB INPUT ==================== -->
+    <div id="tab-input" class="tab-content">
+        <!-- Sub Navigation untuk Input -->
+        <div class="input-subnav">
+            <button class="input-nav-btn active" onclick="switchInputPanel('oee')">🏭 OEE Production</button>
+            <button class="input-nav-btn" onclick="switchInputPanel('listrik')">⚡ Listrik</button>
+            <button class="input-nav-btn" onclick="switchInputPanel('pam')">💧 PAM</button>
         </div>
 
-        <div class="data-table">
-            <div class="header-info">
-                <h3>📋 Data OEE Lengkap</h3>
-                <span class="jumlah-data" id="jumlahData">0 data</span>
+        <!-- Panel Input OEE -->
+        <div id="input-oee" class="input-panel active">
+            <div class="card">
+                <div class="card-title">📝 Input Data Produksi Harian</div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Tanggal</label><input type="date" id="tgl" value="2025-12-27"></div>
+                    <div class="form-group"><label>Line</label><select id="line"><option value="Line 1">Line 1 (Seasoning)</option><option value="Line 2">Line 2 (Kaldu)</option></select></div>
+                    <div class="form-group"><label>Produk Variant</label><select id="produk"><option value="Kaldu Sapi">Kaldu Sapi</option><option value="Kaldu Ayam">Kaldu Ayam</option></select></div>
+                    <div class="form-group"><label>Jam Kerja (menit)</label><input type="number" id="jamKerja" placeholder="Total menit kerja"></div>
+                    <div class="form-group"><label>Target (dus)</label><input type="number" id="target" placeholder="Target produksi dus"></div>
+                    <div class="form-group"><label>Hasil FG (dus)</label><input type="number" id="hasilFg" placeholder="Hasil jadi dalam dus"></div>
+                    <div class="form-group"><label>Reject (pcs)</label><input type="number" id="reject" placeholder="Jumlah reject pcs"></div>
+                    <div class="form-group"><label>Man Power</label><input type="number" id="manPower" placeholder="Jumlah operator"></div>
+                    <div class="form-group"><label>Speed (pcs/menit)</label><input type="number" id="speed" placeholder="Kecepatan produksi"></div>
+                    <div class="form-group"><label>Isi 1 Dus (pcs)</label><input type="number" id="isiDus" placeholder="Isi per dus"></div>
+                    <div class="form-group"><label>Downtime All (menit)</label><input type="number" id="dtAll" placeholder="Total downtime"></div>
+                    <div class="form-group"><label>Planned Downtime (menit)</label><input type="number" id="pdt" placeholder="Planned downtime"></div>
+                </div>
+                <button class="btn-submit" onclick="simpanOEE()">💾 Simpan Data OEE</button>
             </div>
-            <div style="overflow-x: auto; max-height: 500px;">
-                <table id="oeeTable">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th><th>Line</th><th>Produk</th><th>Target</th><th>Hasil FG</th>
-                            <th>Reject</th><th>OEE</th><th>Availability</th><th>Performance</th><th>Quality</th><th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="oeeTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== TAB 2: INPUT OEE ==================== -->
-    <div id="input" class="tab-content">
-        <div class="form-card">
-            <h3>📝 Form Input OEE</h3>
-            <form id="oeeForm">
-                <div class="form-row">
-                    <div class="form-group"><label>Tanggal *</label><input type="date" id="tanggal" required></div>
-                    <div class="form-group"><label>Line *</label><select id="line_id" required></select></div>
-                    <div class="form-group"><label>Jam Kerja *</label><input type="number" id="jam_kerja" required></div>
+            <div class="card">
+                <div class="card-title">📋 Riwayat Data OEE</div>
+                <div class="filter-bar">
+                    <input type="text" id="filterLine" placeholder="Filter Line" onkeyup="loadOEEList()">
+                    <input type="month" id="filterBulan" onchange="loadOEEList()">
                 </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Produk Variant</label><input type="text" id="produk_variant" value="Kaldu Ayam"></div>
-                    <div class="form-group"><label>Pack Vol</label><input type="text" id="pack_vol" value="8gr"></div>
-                    <div class="form-group"><label>Target *</label><input type="number" id="target" required></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Hasil FG *</label><input type="number" id="hasil_fg" required></div>
-                    <div class="form-group"><label>Reject *</label><input type="number" id="reject" required></div>
-                    <div class="form-group"><label>Man Power</label><input type="number" id="man_power" value="31"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Speed / LHP</label><input type="number" id="speed_lhp" value="50"></div>
-                    <div class="form-group"><label>Isi 1 Dus (Pcs) *</label><input type="number" id="isi_1_dus_pcs" value="480" required></div>
-                    <div class="form-group"><label>DT All</label><input type="number" id="dt_all" value="0"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>PDT</label><input type="number" id="pdt" value="0"></div>
-                    <div class="form-group"><label>Speed Avg</label><input type="number" id="speed_avg" value="50"></div>
-                    <div class="form-group"><label>Jam Kerja/Line</label><input type="number" id="jam_kerja_per_line" value="1260"></div>
-                </div>
-                <button type="button" onclick="hitungDanSimpan()">💾 Hitung & Simpan</button>
-                <button type="reset">Reset</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ==================== TAB 3: KELOLA MESIN ==================== -->
-    <div id="mesin" class="tab-content">
-        <div class="form-card">
-            <h3>➕ Tambah Line/Mesin Baru</h3>
-            <div class="form-row">
-                <div class="form-group"><label>Nama Line</label><input type="text" id="nama_line_baru" placeholder="Contoh: Line 4"></div>
-                <button onclick="tambahLine()" style="margin-top: 30px;">Tambah Line</button>
+                <div class="data-table" id="oeeList"></div>
             </div>
         </div>
-        <div class="data-table">
-            <h3 style="padding: 15px;">⚙️ Daftar Line/Mesin</h3>
-            <table id="mesinTable">
-                <thead><tr><th>ID</th><th>Nama Line</th><th>Status</th><th>Aksi</th></tr></thead>
-                <tbody id="mesinTableBody"></tbody>
-            </table>
+
+        <!-- Panel Input Listrik -->
+        <div id="input-listrik" class="input-panel">
+            <div class="card">
+                <div class="card-title">⚡ Input Pemakaian Listrik (Periode Start - End)</div>
+                <div class="periode-range">
+                    <div class="form-group"><label>Periode Start</label><input type="date" id="listrikStart"></div>
+                    <div class="form-group"><label>Periode End</label><input type="date" id="listrikEnd"></div>
+                </div>
+                
+                <div class="section-title">🔧 MESIN PRODUKSI</div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Mixing Reborn (kWh)</label><input type="number" id="kwhMixing" step="0.01" placeholder="Total kWh"></div>
+                    <div class="form-group"><label>Screw Transfer (kWh)</label><input type="number" id="kwhTransfer" step="0.01" placeholder="Total kWh"></div>
+                    <div class="form-group"><label>Filling Line 1 - Seasoning (kWh)</label><input type="number" id="kwhFilling1" step="0.01" placeholder="Total kWh"></div>
+                    <div class="form-group"><label>Filling Line 2 - Kaldu (kWh)</label><input type="number" id="kwhFilling2" step="0.01" placeholder="Total kWh"></div>
+                </div>
+                
+                <div class="section-title">⚙️ UTILITY</div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Compressor (kWh)</label><input type="number" id="kwhComp" step="0.01" placeholder="Total kWh"></div>
+                    <div class="form-group"><label>HVAC (kWh)</label><input type="number" id="kwhHvac" step="0.01" placeholder="Total kWh"></div>
+                </div>
+                
+                <button class="btn-submit" onclick="simpanListrik()">💾 Simpan Data Listrik Periode</button>
+            </div>
+            <div class="card">
+                <div class="card-title">📋 Riwayat Pemakaian Listrik</div>
+                <div class="data-table" id="listrikList"></div>
+            </div>
+        </div>
+
+        <!-- Panel Input PAM -->
+        <div id="input-pam" class="input-panel">
+            <div class="card">
+                <div class="card-title">💧 Input Pemakaian PAM (Periode Start - End)</div>
+                <div class="periode-range">
+                    <div class="form-group"><label>Periode Start</label><input type="date" id="pamStart"></div>
+                    <div class="form-group"><label>Periode End</label><input type="date" id="pamEnd"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Pemakaian (m³)</label><input type="number" id="volPam" step="0.01" placeholder="Total meter kubik"></div>
+                </div>
+                <button class="btn-submit" onclick="simpanPam()">💾 Simpan Data PAM Periode</button>
+            </div>
+            <div class="card">
+                <div class="card-title">📋 Riwayat Pemakaian PAM</div>
+                <div class="data-table" id="pamList"></div>
+            </div>
         </div>
     </div>
 
-    <!-- ==================== TAB 4: AUDIT TRAIL ==================== -->
-    <div id="audit" class="tab-content">
-        <div class="data-table">
-            <h3 style="padding: 15px;">📜 Riwayat Audit Trail</h3>
-            <table id="auditTable">
-                <thead><tr><th>Waktu</th><th>User</th><th>Aksi</th><th>Detail</th></tr></thead>
-                <tbody id="auditTableBody"></tbody>
-            </table>
+    <!-- ==================== TAB MANAGEMENT ==================== -->
+    <div id="tab-management" class="tab-content">
+        <div class="card">
+            <div class="card-title">💰 Master Data Harga</div>
+            <div class="form-grid">
+                <div class="form-group"><label>Harga Listrik per kWh (Rp)</label><input type="number" id="hargaPerKwh" step="1" placeholder="contoh: 1700"></div>
+                <div class="form-group"><label>Harga Air per m³ (Rp)</label><input type="number" id="hargaPerM3" step="1" placeholder="contoh: 5000"></div>
+            </div>
+            <button class="btn-submit" onclick="simpanMasterHarga()">💾 Simpan Master Harga</button>
+        </div>
+        <div class="card">
+            <div class="card-title">📋 Master Data Saat Ini</div>
+            <div id="masterDataInfo"></div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB AUDIT TRAIL ==================== -->
+    <div id="tab-audit" class="tab-content">
+        <div class="card">
+            <div class="card-title">📜 Audit Trail Perubahan Harga</div>
+            <div class="data-table" id="auditList"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // ==================== DATA OEE LENGKAP (23 RECORD) ====================
-    const dummyDataOEE = [
-        {id:1,tanggal:"2025-12-27",line_id:2,produk_variant:"Kaldu Sapi",target:480,hasil_fg:389,reject:4347,oee:91.18,availability:89.94,performance:103.73,quality:97.72,jam_kerja:900,isi_1_dus_pcs:480,dt_all:362,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:273,speed_avg:50,jam_kerja_per_line:600,total_fg_pcs:186720,total_fg_ton:1.5087,achievement:81.04},
-        {id:2,tanggal:"2025-12-26",line_id:2,produk_variant:"Kaldu Sapi",target:675,hasil_fg:710,reject:10000,oee:78.38,availability:89.48,performance:90.16,quality:97.15,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:795,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:402,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:340800,total_fg_ton:2.7537,achievement:105.19},
-        {id:3,tanggal:"2025-12-24",line_id:2,produk_variant:"Kaldu Sapi",target:480,hasil_fg:376,reject:7167,oee:52.12,availability:70.26,performance:77.13,quality:96.18,jam_kerja:780,isi_1_dus_pcs:480,dt_all:1392,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:217,speed_avg:50,jam_kerja_per_line:780,total_fg_pcs:180480,total_fg_ton:1.4583,achievement:78.33},
-        {id:4,tanggal:"2025-12-23",line_id:2,produk_variant:"Kaldu Sapi",target:675,hasil_fg:706,reject:12010,oee:72.87,availability:84.17,performance:89.65,quality:96.58,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1197,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:351,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:338880,total_fg_ton:2.7382,achievement:104.59},
-        {id:5,tanggal:"2025-12-22",line_id:2,produk_variant:"Kaldu Ayam",target:480,hasil_fg:510,reject:10303,oee:74.74,availability:88.76,performance:87.74,quality:95.96,jam_kerja:930,isi_1_dus_pcs:480,dt_all:627,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:306,speed_avg:50,jam_kerja_per_line:930,total_fg_pcs:244800,total_fg_ton:1.9780,achievement:106.25},
-        {id:6,tanggal:"2025-12-20",line_id:2,produk_variant:"Kaldu Ayam",target:450,hasil_fg:473,reject:8585,oee:80.51,availability:92.74,performance:90.10,quality:96.36,jam_kerja:840,isi_1_dus_pcs:480,dt_all:366,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:100,speed_avg:50,jam_kerja_per_line:840,total_fg_pcs:227040,total_fg_ton:1.8345,achievement:105.11},
-        {id:7,tanggal:"2025-12-19",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:732,reject:10346,oee:82.23,availability:91.07,performance:92.95,quality:97.14,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:675,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:428,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:351360,total_fg_ton:2.8390,achievement:108.44},
-        {id:8,tanggal:"2025-12-18",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:654,reject:17990,oee:63.07,availability:80.29,performance:83.05,quality:94.58,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1490,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:358,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:313920,total_fg_ton:2.5365,achievement:96.89},
-        {id:9,tanggal:"2025-12-17",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:657,reject:15491,oee:64.61,availability:81.24,performance:83.43,quality:95.32,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1418,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:388,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:315360,total_fg_ton:2.5481,achievement:97.33},
-        {id:10,tanggal:"2025-12-16",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:643,reject:13238,oee:67.44,availability:86.14,performance:81.65,quality:95.89,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1048,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:355,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:308640,total_fg_ton:2.4938,achievement:95.26},
-        {id:11,tanggal:"2025-12-15",line_id:2,produk_variant:"Kaldu Ayam",target:560,hasil_fg:608,reject:15841,oee:53.54,availability:73.11,performance:77.21,quality:94.85,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1694,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:365,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:291840,total_fg_ton:2.3581,achievement:108.57},
-        {id:12,tanggal:"2025-12-13",line_id:2,produk_variant:"Kaldu Ayam",target:480,hasil_fg:423,reject:8789,oee:48.96,availability:61.13,performance:83.56,quality:95.85,jam_kerja:900,isi_1_dus_pcs:480,dt_all:1889,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:232,speed_avg:50,jam_kerja_per_line:810,total_fg_pcs:203040,total_fg_ton:1.6406,achievement:88.13},
-        {id:13,tanggal:"2025-12-12",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:563,reject:11311,oee:48.31,availability:70.40,performance:71.49,quality:95.98,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:2238,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:361,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:270240,total_fg_ton:2.1835,achievement:83.41},
-        {id:14,tanggal:"2025-12-11",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:632,reject:10796,oee:56.79,availability:73.28,performance:80.25,quality:96.56,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:2020,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:116,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:303360,total_fg_ton:2.4511,achievement:93.63},
-        {id:15,tanggal:"2025-12-10",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:732,reject:10012,oee:77.35,availability:85.58,performance:92.95,quality:97.23,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1090,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:495,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:351360,total_fg_ton:2.8390,achievement:108.44},
-        {id:16,tanggal:"2025-12-09",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:730,reject:14948,oee:76.10,availability:85.60,performance:92.70,quality:95.91,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1089,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:380,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:350400,total_fg_ton:2.8312,achievement:108.15},
-        {id:17,tanggal:"2025-12-08",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:726,reject:12006,oee:77.44,availability:86.89,performance:92.19,quality:96.67,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:991,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:374,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:348480,total_fg_ton:2.8157,achievement:107.56},
-        {id:18,tanggal:"2025-12-06",line_id:2,produk_variant:"Kaldu Ayam",target:480,hasil_fg:495,reject:7734,oee:90.06,availability:95.10,performance:97.78,quality:96.85,jam_kerja:810,isi_1_dus_pcs:480,dt_all:238,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:50,speed_avg:50,jam_kerja_per_line:810,total_fg_pcs:237600,total_fg_ton:1.9198,achievement:103.13},
-        {id:19,tanggal:"2025-12-05",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:737,reject:8469,oee:85.49,availability:93.53,performance:93.59,quality:97.66,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:489,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:162,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:353760,total_fg_ton:2.8584,achievement:109.19},
-        {id:20,tanggal:"2025-12-04",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:739,reject:11639,oee:80.79,availability:88.92,performance:93.84,quality:96.82,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:838,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:291,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:354720,total_fg_ton:2.8661,achievement:109.48},
-        {id:21,tanggal:"2025-12-03",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:766,reject:12241,oee:85.18,availability:90.49,performance:97.27,quality:96.78,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:719,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:248,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:367680,total_fg_ton:2.9709,achievement:113.48},
-        {id:22,tanggal:"2025-12-02",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:738,reject:12391,oee:82.56,availability:91.18,performance:93.71,quality:96.62,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:667,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:237,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:354240,total_fg_ton:2.8623,achievement:109.33},
-        {id:23,tanggal:"2025-12-01",line_id:2,produk_variant:"Kaldu Sapi",target:480,hasil_fg:478,reject:9521,oee:66.42,availability:81.41,performance:84.98,quality:96.02,jam_kerja:900,isi_1_dus_pcs:480,dt_all:1004,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:364,speed_avg:50,jam_kerja_per_line:900,total_fg_pcs:229440,total_fg_ton:1.8539,achievement:99.58}
-    ];
-
-    // Global variables
-    let dataOEE = [];
-    let dataLine = [];
-    let auditTrail = [];
-    let nextId = 24;
-
-    // Initialize data
+    // ============ INITIAL DATA ============
     function initData() {
-        // Langsung pake dummy data
-        dataOEE = JSON.parse(JSON.stringify(dummyDataOEE));
-        nextId = 24;
-        
-        dataLine = [
-            {id: 1, nama: 'Line 1', aktif: true},
-            {id: 2, nama: 'Line 2', aktif: true},
-            {id: 3, nama: 'Line 3', aktif: true}
-        ];
-        
-        auditTrail = [{
-            id: 1, waktu: new Date().toISOString(), user: 'system', aksi: 'INIT', detail: 'Database OEE dengan 23 record'
-        }];
-        
-        simpanKeLocalStorage();
-    }
-
-    function simpanKeLocalStorage() {
-        localStorage.setItem('oee_data', JSON.stringify(dataOEE));
-        localStorage.setItem('line_data', JSON.stringify(dataLine));
-        localStorage.setItem('audit_data', JSON.stringify(auditTrail));
-    }
-
-    function addAudit(user, aksi, detail) {
-        const newAudit = {
-            id: auditTrail.length + 1,
-            waktu: new Date().toISOString(),
-            user: user || 'admin',
-            aksi: aksi,
-            detail: detail
-        };
-        auditTrail.unshift(newAudit);
-        if(auditTrail.length > 200) auditTrail.pop();
-        simpanKeLocalStorage();
-    }
-
-    function getLineName(lineId) {
-        const line = dataLine.find(l => l.id == lineId);
-        return line ? line.nama : 'Line ' + lineId;
-    }
-
-    function hitungDanSimpan() {
-        const lineId = parseInt(document.getElementById('line_id').value);
-        
-        const newData = {
-            id: nextId++,
-            tanggal: document.getElementById('tanggal').value,
-            line_id: lineId,
-            jam_kerja: parseInt(document.getElementById('jam_kerja').value),
-            produk_variant: document.getElementById('produk_variant').value,
-            pack_vol: document.getElementById('pack_vol').value,
-            target: parseInt(document.getElementById('target').value),
-            hasil_fg: parseInt(document.getElementById('hasil_fg').value),
-            reject: parseInt(document.getElementById('reject').value),
-            man_power: parseInt(document.getElementById('man_power').value) || 0,
-            speed_lhp: parseInt(document.getElementById('speed_lhp').value) || 0,
-            isi_1_dus_pcs: parseInt(document.getElementById('isi_1_dus_pcs').value),
-            dt_all: parseInt(document.getElementById('dt_all').value) || 0,
-            pdt: parseInt(document.getElementById('pdt').value) || 0,
-            speed_avg: parseInt(document.getElementById('speed_avg').value) || 0,
-            jam_kerja_per_line: parseInt(document.getElementById('jam_kerja_per_line').value) || 0
-        };
-
-        if(!newData.tanggal || !newData.jam_kerja || !newData.target || !newData.hasil_fg) {
-            alert('Harap isi field yang wajib (*)');
-            return;
+        if (!localStorage.getItem('masterHarga')) {
+            localStorage.setItem('masterHarga', JSON.stringify({ hargaPerKwh: 1700, hargaPerM3: 5000, lastUpdate: new Date().toISOString() }));
         }
-
-        // Hitung OEE
-        let totalFGPcs = newData.hasil_fg * newData.isi_1_dus_pcs;
-        let achievement = (newData.hasil_fg / newData.target) * 100;
-        let availability = ((newData.jam_kerja - newData.dt_all) / newData.jam_kerja) * 100;
-        let speedTarget = 50;
-        let performance = (totalFGPcs / (newData.jam_kerja * speedTarget)) * 100;
-        let quality = ((totalFGPcs - newData.reject) / totalFGPcs) * 100;
-        let oee = (availability * performance * quality) / 10000;
-
-        const finalData = {
-            ...newData,
-            total_fg_pcs: totalFGPcs,
-            total_fg_ton: parseFloat((totalFGPcs / 123750).toFixed(4)),
-            achievement: parseFloat(achievement.toFixed(2)),
-            availability: parseFloat(availability.toFixed(2)),
-            performance: parseFloat(performance.toFixed(2)),
-            quality: parseFloat(quality.toFixed(2)),
-            oee: parseFloat(oee.toFixed(2))
-        };
-
-        dataOEE.push(finalData);
-        addAudit('admin', 'INSERT', `Menambah data OEE untuk ${getLineName(lineId)} tgl ${finalData.tanggal} (OEE: ${finalData.oee}%)`);
-        simpanKeLocalStorage();
-        alert(`Data berhasil disimpan!\nOEE: ${finalData.oee}%`);
-        document.getElementById('oeeForm').reset();
-        renderAll();
-        showTab('dashboard', document.querySelector('.tab-btn'));
+        if (!localStorage.getItem('auditTrail')) {
+            localStorage.setItem('auditTrail', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('oeeData')) localStorage.setItem('oeeData', JSON.stringify([]));
+        if (!localStorage.getItem('listrikData')) localStorage.setItem('listrikData', JSON.stringify([]));
+        if (!localStorage.getItem('pamData')) localStorage.setItem('pamData', JSON.stringify([]));
+        
+        loadMasterDataInfo();
     }
 
-    function hapusDataOEE(id) {
-        if(confirm('Yakin hapus data ini?')) {
-            const deleted = dataOEE.find(d => d.id == id);
-            dataOEE = dataOEE.filter(d => d.id != id);
-            addAudit('admin', 'DELETE', `Menghapus data OEE untuk ${getLineName(deleted.line_id)} tgl ${deleted.tanggal}`);
-            simpanKeLocalStorage();
-            renderAll();
-        }
-    }
-
-    function tambahLine() {
-        const nama = document.getElementById('nama_line_baru').value.trim();
-        if(!nama) return alert('Nama line harus diisi');
-        const newId = dataLine.length + 1;
-        dataLine.push({id: newId, nama: nama, aktif: true});
-        addAudit('admin', 'INSERT', `Menambah line baru: ${nama}`);
-        simpanKeLocalStorage();
-        document.getElementById('nama_line_baru').value = '';
-        renderAll();
-    }
-
-    function toggleLineStatus(id) {
-        const line = dataLine.find(l => l.id == id);
-        if(line) {
-            line.aktif = !line.aktif;
-            addAudit('admin', 'UPDATE', `${line.nama} status menjadi ${line.aktif ? 'Aktif' : 'Nonaktif'}`);
-            simpanKeLocalStorage();
-            renderAll();
-        }
-    }
-
-    function renderDashboard() {
-        if(dataOEE.length === 0) {
-            document.getElementById('statsGrid').innerHTML = '<div class="stat-card"><h3>Tidak ada data</h3></div>';
-            return;
-        }
-
-        const avgOEE = dataOEE.reduce((sum, d) => sum + d.oee, 0) / dataOEE.length;
-        const avgAvail = dataOEE.reduce((sum, d) => sum + d.availability, 0) / dataOEE.length;
-        const avgPerf = dataOEE.reduce((sum, d) => sum + d.performance, 0) / dataOEE.length;
-        const avgQual = dataOEE.reduce((sum, d) => sum + d.quality, 0) / dataOEE.length;
-        const totalReject = dataOEE.reduce((sum, d) => sum + d.reject, 0);
-        const totalProduksi = dataOEE.reduce((sum, d) => sum + (d.hasil_fg * d.isi_1_dus_pcs), 0);
-        const bestOEE = Math.max(...dataOEE.map(d => d.oee));
-        const worstOEE = Math.min(...dataOEE.map(d => d.oee));
-
-        document.getElementById('statsGrid').innerHTML = `
-            <div class="stat-card"><h3>📊 Rata-rata OEE</h3><div class="value">${avgOEE.toFixed(2)}%</div></div>
-            <div class="stat-card"><h3>🏆 OEE Tertinggi</h3><div class="value">${bestOEE.toFixed(2)}%</div></div>
-            <div class="stat-card"><h3>📉 OEE Terendah</h3><div class="value">${worstOEE.toFixed(2)}%</div></div>
-            <div class="stat-card"><h3>⏱️ Availability</h3><div class="value">${avgAvail.toFixed(2)}%</div></div>
-            <div class="stat-card"><h3>⚡ Performance</h3><div class="value">${avgPerf.toFixed(2)}%</div></div>
-            <div class="stat-card"><h3>✅ Quality</h3><div class="value">${avgQual.toFixed(2)}%</div></div>
-            <div class="stat-card"><h3>🗑️ Total Reject</h3><div class="value">${totalReject.toLocaleString()}</div></div>
-            <div class="stat-card"><h3>📦 Total Produksi</h3><div class="value">${totalProduksi.toLocaleString()}</div></div>
-        `;
-    }
-
-    function renderOEETable() {
-        const tbody = document.getElementById('oeeTableBody');
-        if(!tbody) return;
-        
-        let filteredData = [...dataOEE];
-        
-        const filterProduk = document.getElementById('filterProduk')?.value.toLowerCase() || '';
-        if(filterProduk) {
-            filteredData = filteredData.filter(d => d.produk_variant.toLowerCase().includes(filterProduk));
-        }
-        
-        const tglMulai = document.getElementById('filterTanggalMulai')?.value;
-        const tglSelesai = document.getElementById('filterTanggalSelesai')?.value;
-        if(tglMulai) filteredData = filteredData.filter(d => d.tanggal >= tglMulai);
-        if(tglSelesai) filteredData = filteredData.filter(d => d.tanggal <= tglSelesai);
-        
-        const filterLineVal = document.getElementById('filterLine')?.value;
-        if(filterLineVal) filteredData = filteredData.filter(d => d.line_id == filterLineVal);
-        
-        filteredData.sort((a,b) => b.tanggal.localeCompare(a.tanggal));
-        
-        document.getElementById('jumlahData').innerText = filteredData.length + ' data';
-        
-        tbody.innerHTML = '';
-        if(filteredData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">Tidak ada数据</td></tr>';
-            return;
-        }
-        
-        filteredData.forEach(d => {
-            let oeeClass = d.oee >= 85 ? 'badge-high' : (d.oee >= 60 ? 'badge-medium' : 'badge-low');
-            tbody.innerHTML += `
-                <tr>
-                    <td>${d.tanggal}</td>
-                    <td>${getLineName(d.line_id)}</td>
-                    <td>${d.produk_variant}</td>
-                    <td>${d.target}</td>
-                    <td>${d.hasil_fg}</td>
-                    <td>${d.reject.toLocaleString()}</td>
-                    <td><span class="badge ${oeeClass}">${d.oee}%</span></td>
-                    <td>${d.availability}%</td>
-                    <td>${d.performance}%</td>
-                    <td>${d.quality}%</td>
-                    <td><button class="action-btn" onclick="hapusDataOEE(${d.id})">🗑️</button></td>
-                </tr>
-            `;
+    function addAudit(jenis, oldValue, newValue, keterangan) {
+        let audit = JSON.parse(localStorage.getItem('auditTrail') || '[]');
+        audit.unshift({
+            id: Date.now(),
+            tanggal: new Date().toLocaleString('id-ID'),
+            jenis: jenis,
+            oldValue: oldValue,
+            newValue: newValue,
+            keterangan: keterangan,
+            user: 'Admin'
         });
+        localStorage.setItem('auditTrail', JSON.stringify(audit.slice(0, 100)));
+        if (document.getElementById('tab-audit').classList.contains('active')) loadAuditList();
     }
 
-    function renderLineSelect() {
-        const select = document.getElementById('line_id');
-        if(select) {
-            select.innerHTML = '';
-            dataLine.filter(l => l.aktif).forEach(line => {
-                select.innerHTML += `<option value="${line.id}">${line.nama}</option>`;
-            });
+    function loadMasterDataInfo() {
+        let master = JSON.parse(localStorage.getItem('masterHarga') || '{}');
+        document.getElementById('masterDataInfo').innerHTML = `
+            <p><strong>Harga Listrik:</strong> Rp ${(master.hargaPerKwh || 0).toLocaleString()} / kWh</p>
+            <p><strong>Harga Air:</strong> Rp ${(master.hargaPerM3 || 0).toLocaleString()} / m³</p>
+            <p><strong>Terakhir Update:</strong> ${master.lastUpdate ? new Date(master.lastUpdate).toLocaleString('id-ID') : '-'}</p>
+        `;
+        if (document.getElementById('hargaPerKwh')) document.getElementById('hargaPerKwh').value = master.hargaPerKwh || 1700;
+        if (document.getElementById('hargaPerM3')) document.getElementById('hargaPerM3').value = master.hargaPerM3 || 5000;
+    }
+
+    function simpanMasterHarga() {
+        let oldMaster = JSON.parse(localStorage.getItem('masterHarga') || '{}');
+        let newHargaKwh = parseFloat(document.getElementById('hargaPerKwh').value);
+        let newHargaM3 = parseFloat(document.getElementById('hargaPerM3').value);
+        
+        let newMaster = {
+            hargaPerKwh: newHargaKwh,
+            hargaPerM3: newHargaM3,
+            lastUpdate: new Date().toISOString()
+        };
+        
+        if (oldMaster.hargaPerKwh !== newHargaKwh) {
+            addAudit('Harga Listrik', `Rp ${oldMaster.hargaPerKwh?.toLocaleString() || '-'} / kWh`, `Rp ${newHargaKwh.toLocaleString()} / kWh`, 'Update tarif listrik');
+        }
+        if (oldMaster.hargaPerM3 !== newHargaM3) {
+            addAudit('Harga Air', `Rp ${oldMaster.hargaPerM3?.toLocaleString() || '-'} / m³`, `Rp ${newHargaM3.toLocaleString()} / m³`, 'Update tarif PDAM');
         }
         
-        const filterSelect = document.getElementById('filterLine');
-        if(filterSelect) {
-            const currentVal = filterSelect.value;
-            filterSelect.innerHTML = '<option value="">Semua Line</option>';
-            dataLine.forEach(line => {
-                filterSelect.innerHTML += `<option value="${line.id}">${line.nama}</option>`;
-            });
-            if(currentVal) filterSelect.value = currentVal;
-        }
+        localStorage.setItem('masterHarga', JSON.stringify(newMaster));
+        alert('Master harga tersimpan!');
+        loadMasterDataInfo();
     }
 
-    function renderMesinTable() {
-        const tbody = document.getElementById('mesinTableBody');
-        if(tbody) {
-            tbody.innerHTML = '';
-            dataLine.forEach(line => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${line.id}</td>
-                        <td>${line.nama}</td>
-                        <td><span class="badge ${line.aktif ? 'badge-high' : 'badge-low'}">${line.aktif ? 'Aktif' : 'Nonaktif'}</span></td>
-                        <td><button onclick="toggleLineStatus(${line.id})">${line.aktif ? 'Nonaktifkan' : 'Aktifkan'}</button></td>
-                    </tr>
-                `;
-            });
-        }
+    function loadAuditList() {
+        let audit = JSON.parse(localStorage.getItem('auditTrail') || '[]');
+        let html = `<table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Nilai Lama</th><th>Nilai Baru</th><th>Keterangan</th><th>User</th></tr></thead><tbody>`;
+        audit.forEach(a => {
+            html += `<tr><td>${a.tanggal}</td><td>${a.jenis}</td><td>${a.oldValue}</td><td>${a.newValue}</td><td>${a.keterangan}</td><td>${a.user}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+        document.getElementById('auditList').innerHTML = html || '<p>Belum ada perubahan harga</p>';
     }
 
-    function renderAuditTable() {
-        const tbody = document.getElementById('auditTableBody');
-        if(tbody) {
-            tbody.innerHTML = '';
-            auditTrail.slice(0, 50).forEach(audit => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${new Date(audit.waktu).toLocaleString()}</td>
-                        <td>${audit.user}</td>
-                        <td>${audit.aksi}</td>
-                        <td>${audit.detail}</td>
-                    </tr>
-                `;
-            });
-        }
-    }
-
-    function resetFilter() {
-        document.getElementById('filterProduk').value = '';
-        document.getElementById('filterTanggalMulai').value = '';
-        document.getElementById('filterTanggalSelesai').value = '';
-        document.getElementById('filterLine').value = '';
-        renderOEETable();
-    }
-
-    function renderAll() {
-        renderDashboard();
-        renderOEETable();
-        renderLineSelect();
-        renderMesinTable();
-        renderAuditTable();
-    }
-
-    function showTab(tabName, btn) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.getElementById(tabName).classList.add('active');
+    // ============ OEE FUNCTIONS ============
+    function hitungOEE(data) {
+        let jamKerja = parseFloat(data.jamKerja) || 0;
+        let dtAll = parseFloat(data.dtAll) || 0;
+        let pdt = parseFloat(data.pdt) || 0;
+        let target = parseFloat(data.target) || 0;
+        let hasilFg = parseFloat(data.hasilFg) || 0;
+        let reject = parseFloat(data.reject) || 0;
+        let speed = parseFloat(data.speed) || 0;
+        let isiDus = parseFloat(data.isiDus) || 0;
         
-        if(btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+        let totalDowntime = dtAll + pdt;
+        let availability = jamKerja > 0 ? ((jamKerja - totalDowntime) / jamKerja) * 100 : 0;
+        let actualOutput = jamKerja > 0 ? (hasilFg * isiDus) / jamKerja : 0;
+        let performance = speed > 0 ? (actualOutput / speed) * 100 : 0;
+        let totalProduksi = hasilFg * isiDus;
+        let quality = totalProduksi > 0 ? ((totalProduksi - reject) / totalProduksi) * 100 : 0;
+        let oee = (availability * performance * quality) / 10000;
         
-        renderAll();
+        return { availability: availability.toFixed(2), performance: performance.toFixed(2), quality: quality.toFixed(2), oee: oee.toFixed(2) };
     }
 
-    // Start the app
+    function simpanOEE() {
+        let data = {
+            id: Date.now(), tanggal: document.getElementById('tgl').value, line: document.getElementById('line').value,
+            produk: document.getElementById('produk').value, jamKerja: parseFloat(document.getElementById('jamKerja').value) || 0,
+            target: parseFloat(document.getElementById('target').value) || 0, hasilFg: parseFloat(document.getElementById('hasilFg').value) || 0,
+            reject: parseFloat(document.getElementById('reject').value) || 0, manPower: parseFloat(document.getElementById('manPower').value) || 0,
+            speed: parseFloat(document.getElementById('speed').value) || 0, isiDus: parseFloat(document.getElementById('isiDus').value) || 0,
+            dtAll: parseFloat(document.getElementById('dtAll').value) || 0, pdt: parseFloat(document.getElementById('pdt').value) || 0
+        };
+        let oeeResult = hitungOEE(data);
+        data.availability = oeeResult.availability; data.performance = oeeResult.performance; data.quality = oeeResult.quality; data.oee = oeeResult.oee;
+        data.bulan = data.tanggal.substring(0,7);
+        
+        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
+        oeeData.push(data);
+        localStorage.setItem('oeeData', JSON.stringify(oeeData));
+        alert('Data OEE tersimpan!');
+        loadOEEList(); updateDashboard();
+    }
+
+    function loadOEEList() {
+        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
+        let filterLine = document.getElementById('filterLine')?.value.toLowerCase() || '';
+        let filterBulan = document.getElementById('filterBulan')?.value || '';
+        let filtered = oeeData.filter(d => (!filterLine || d.line.toLowerCase().includes(filterLine)) && (!filterBulan || d.tanggal.startsWith(filterBulan)));
+        filtered.sort((a,b) => b.tanggal.localeCompare(a.tanggal));
+        let html = `<tr><thead> hilab<th>Tanggal</th><th>Line</th><th>Produk</th><th>Jam Kerja</th><th>Target</th><th>Hasil FG</th><th>Reject</th><th>OEE</th><th>Aksi</th></tr></thead><tbody>`;
+        filtered.forEach(d => { html += `<tr><td>${d.tanggal}</td><td>${d.line}</td><td>${d.produk}</td><td>${d.jamKerja}</td><td>${d.target}</td><td>${d.hasilFg}</td><td>${d.reject}</td><td style="background:${d.oee>=85?'#d4edda':(d.oee>=70?'#fff3cd':'#f8d7da')};font-weight:bold;">${d.oee}%</td><td><button class="btn-delete" onclick="hapusOEE(${d.id})">Hapus</button></td></tr>`; });
+        html += `</tbody></table>`;
+        document.getElementById('oeeList').innerHTML = html || '<p>Tidak ada data</p>';
+    }
+
+    function hapusOEE(id) { let data = JSON.parse(localStorage.getItem('oeeData') || '[]'); localStorage.setItem('oeeData', JSON.stringify(data.filter(d=>d.id!==id))); loadOEEList(); updateDashboard(); }
+
+    // ============ LISTRIK FUNCTIONS ============
+    function simpanListrik() {
+        let start = document.getElementById('listrikStart').value;
+        let end = document.getElementById('listrikEnd').value;
+        if (!start || !end) { alert('Isi periode start dan end!'); return; }
+        let data = {
+            id: Date.now(), periodeStart: start, periodeEnd: end,
+            mixing: parseFloat(document.getElementById('kwhMixing').value) || 0,
+            transfer: parseFloat(document.getElementById('kwhTransfer').value) || 0,
+            filling1: parseFloat(document.getElementById('kwhFilling1').value) || 0,
+            filling2: parseFloat(document.getElementById('kwhFilling2').value) || 0,
+            compressor: parseFloat(document.getElementById('kwhComp').value) || 0,
+            hvac: parseFloat(document.getElementById('kwhHvac').value) || 0
+        };
+        data.totalMesinProduksi = data.mixing + data.transfer + data.filling1 + data.filling2;
+        data.totalUtility = data.compressor + data.hvac;
+        data.totalKwh = data.totalMesinProduksi + data.totalUtility;
+        
+        let listrikData = JSON.parse(localStorage.getItem('listrikData') || '[]');
+        listrikData.push(data);
+        localStorage.setItem('listrikData', JSON.stringify(listrikData));
+        alert('Data listrik tersimpan!');
+        loadListrikList(); updateDashboard();
+    }
+
+    function loadListrikList() {
+        let data = JSON.parse(localStorage.getItem('listrikData') || '[]');
+        data.sort((a,b) => b.periodeStart.localeCompare(a.periodeStart));
+        let html = `<table><thead><tr><th>Periode Start</th><th>Periode End</th><th>Mixing</th><th>Transfer</th><th>Filling L1</th><th>Filling L2</th><th>Compressor</th><th>HVAC</th><th>Total kWh</th><th>Aksi</th></tr></thead><tbody>`;
+        data.forEach(d => { html += `<tr><td>${d.periodeStart}</td><td>${d.periodeEnd}</td><td>${d.mixing.toLocaleString()}</td><td>${d.transfer.toLocaleString()}</td><td>${d.filling1.toLocaleString()}</td><td>${d.filling2.toLocaleString()}</td><td>${d.compressor.toLocaleString()}</td><td>${d.hvac.toLocaleString()}</td><td><strong>${d.totalKwh.toLocaleString()}</strong></td><td><button class="btn-delete" onclick="hapusListrik(${d.id})">Hapus</button></td>`; });
+        html += `</tbody></table>`;
+        document.getElementById('listrikList').innerHTML = html || '<p>Tidak ada data</p>';
+    }
+    function hapusListrik(id) { let data = JSON.parse(localStorage.getItem('listrikData') || '[]'); localStorage.setItem('listrikData', JSON.stringify(data.filter(d=>d.id!==id))); loadListrikList(); updateDashboard(); }
+
+    // ============ PAM FUNCTIONS ============
+    function simpanPam() {
+        let start = document.getElementById('pamStart').value;
+        let end = document.getElementById('pamEnd').value;
+        if (!start || !end) { alert('Isi periode start dan end!'); return; }
+        let data = { id: Date.now(), periodeStart: start, periodeEnd: end, volume: parseFloat(document.getElementById('volPam').value) || 0 };
+        let pamData = JSON.parse(localStorage.getItem('pamData') || '[]');
+        pamData.push(data);
+        localStorage.setItem('pamData', JSON.stringify(pamData));
+        alert('Data PAM tersimpan!');
+        loadPamList(); updateDashboard();
+    }
+
+    function loadPamList() {
+        let data = JSON.parse(localStorage.getItem('pamData') || '[]');
+        data.sort((a,b) => b.periodeStart.localeCompare(a.periodeStart));
+        let html = `</table><thead><tr><th>Periode Start</th><th>Periode End</th><th>Volume (m³)</th><th>Aksi</th></tr></thead><tbody>`;
+        data.forEach(d => { html += `<tr><td>${d.periodeStart}</td><td>${d.periodeEnd}</td><td>${d.volume.toLocaleString()}</td><td><button class="btn-delete" onclick="hapusPam(${d.id})">Hapus</button></td>`; });
+        html += `</tbody></table>`;
+        document.getElementById('pamList').innerHTML = html || '<p>Tidak ada data</p>';
+    }
+    function hapusPam(id) { let data = JSON.parse(localStorage.getItem('pamData') || '[]'); localStorage.setItem('pamData', JSON.stringify(data.filter(d=>d.id!==id))); loadPamList(); updateDashboard(); }
+
+    // ============ DASHBOARD ============
+    function updateDashboard() {
+        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
+        let listrikData = JSON.parse(localStorage.getItem('listrikData') || '[]');
+        let pamData = JSON.parse(localStorage.getItem('pamData') || '[]');
+        let master = JSON.parse(localStorage.getItem('masterHarga') || '{hargaPerKwh:1700, hargaPerM3:5000}');
+        
+        let avgOee = oeeData.length ? (oeeData.reduce((s,d)=>s+parseFloat(d.oee),0)/oeeData.length).toFixed(2) : 0;
+        let totalProduksi = oeeData.reduce((s,d)=>s+(d.hasilFg*d.isiDus),0);
+        let totalReject = oeeData.reduce((s,d)=>s+d.reject,0);
+        document.getElementById('oeeStats').innerHTML = `
+            <div class="stat-card ${avgOee>=85?'success':(avgOee>=70?'':'warning')}"><h3>Rata-rata OEE</h3><div class="value">${avgOee}%</div><small>Target >85%</small></div>
+            <div class="stat-card"><h3>Total Produksi (pcs)</h3><div class="value">${totalProduksi.toLocaleString()}</div></div>
+            <div class="stat-card warning"><h3>Total Reject</h3><div class="value">${totalReject.toLocaleString()}</div></div>
+            <div class="stat-card"><h3>Hari Produksi</h3><div class="value">${oeeData.length}</div></div>`;
+        
+        let trendHtml = `<table><thead><tr><th>Tanggal</th><th>Line</th><th>OEE</th><th>Availability</th><th>Performance</th><th>Quality</th></tr></thead><tbody>`;
+        [...oeeData].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).slice(0,10).forEach(d=>{ trendHtml+=`<tr><td>${d.tanggal}</td><td>${d.line}</td><td style="color:${d.oee>=85?'green':(d.oee>=70?'orange':'red')};font-weight:bold;">${d.oee}%</td><td>${d.availability}%</td><td>${d.performance}%</td><td>${d.quality}%</td>`; });
+        trendHtml+=`</tbody></table>`;
+        document.getElementById('oeeChart').innerHTML = trendHtml;
+        
+        let listrikHtml = `<table><thead><tr><th>Periode</th><th>Total kWh</th><th>Total Produksi (pcs)</th><th>kWh/1000pcs</th><th>Estimasi Biaya</th></tr></thead><tbody>`;
+        listrikData.forEach(l=>{
+            let oeeInRange = oeeData.filter(o=>o.tanggal>=l.periodeStart && o.tanggal<=l.periodeEnd);
+            let totalPcs = oeeInRange.reduce((s,o)=>s+(o.hasilFg*o.isiDus),0);
+            let intensity = totalPcs>0 ? ((l.totalKwh/totalPcs)*1000).toFixed(2) : '-';
+            let estimasi = l.totalKwh * (master.hargaPerKwh || 1700);
+            listrikHtml+=`<tr><td>${l.periodeStart} s/d ${l.periodeEnd}</td><td>${l.totalKwh.toLocaleString()}</td><td>${totalPcs.toLocaleString()}</td><td>${intensity}</td><td>Rp ${estimasi.toLocaleString()}</td>`;
+        });
+        listrikHtml+=`</tbody></table>`;
+        document.getElementById('listrikVsProduksi').innerHTML = listrikHtml || '<p>Belum ada data listrik</p>';
+        
+        let pamHtml = `<table><thead><tr><th>Periode</th><th>Volume (m³)</th><th>Estimasi Biaya</th></tr></thead><tbody>`;
+        pamData.forEach(p=>{
+            let estimasi = p.volume * (master.hargaPerM3 || 5000);
+            pamHtml+=`<tr><td>${p.periodeStart} s/d ${p.periodeEnd}</td><td>${p.volume.toLocaleString()}</td><td>Rp ${estimasi.toLocaleString()}</td>`;
+        });
+        pamHtml+=`</tbody></table>`;
+        document.getElementById('pamChart').innerHTML = pamHtml || '<p>Belum ada data PAM</p>';
+        
+        // Ringkasan Bulanan
+        let bulanUnik = [...new Set(oeeData.map(o=>o.bulan))];
+        let ringkasanHtml = `<table><thead><tr><th>Bulan</th><th>Total Produksi (pcs)</th><th>Rata OEE</th><th>Total kWh</th><th>Total Air (m³)</th></tr></thead><tbody>`;
+        bulanUnik.forEach(bulan=>{
+            let oeeBulan = oeeData.filter(o=>o.bulan===bulan);
+            let listrikBulan = listrikData.find(l=>l.periodeStart<=bulan+'-01' && l.periodeEnd>=bulan+'-01');
+            let pamBulan = pamData.find(p=>p.periodeStart<=bulan+'-01' && p.periodeEnd>=bulan+'-01');
+            let totalPcs = oeeBulan.reduce((s,o)=>s+(o.hasilFg*o.isiDus),0);
+            let avgOeeBulan = (oeeBulan.reduce((s,o)=>s+parseFloat(o.oee),0)/oeeBulan.length).toFixed(2);
+            ringkasanHtml+=`<tr><td>${bulan}</td><td>${totalPcs.toLocaleString()}</td><td>${avgOeeBulan}%</td><td>${listrikBulan ? listrikBulan.totalKwh.toLocaleString() : '-'}</td><td>${pamBulan ? pamBulan.volume.toLocaleString() : '-'}</td></tr>`;
+        });
+        ringkasanHtml+=`</tbody></table>`;
+        document.getElementById('ringkasanBulanan').innerHTML = ringkasanHtml || '<p>Belum ada data</p>';
+    }
+
+    // ============ NAVIGATION ============
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        event.target.classList.add('active');
+        
+        if(tab==='dashboard') updateDashboard();
+        if(tab==='input') { loadOEEList(); loadListrikList(); loadPamList(); }
+        if(tab==='audit') loadAuditList();
+        if(tab==='management') loadMasterDataInfo();
+    }
+
+    function switchInputPanel(panel) {
+        document.querySelectorAll('.input-panel').forEach(p=>p.classList.remove('active'));
+        document.querySelectorAll('.input-nav-btn').forEach(b=>b.classList.remove('active'));
+        document.getElementById(`input-${panel}`).classList.add('active');
+        event.target.classList.add('active');
+        
+        if(panel==='oee') loadOEEList();
+        if(panel==='listrik') loadListrikList();
+        if(panel==='pam') loadPamList();
+    }
+
     initData();
-    renderAll();
-    
-    // Expose functions
-    window.showTab = showTab;
-    window.hapusDataOEE = hapusDataOEE;
-    window.toggleLineStatus = toggleLineStatus;
-    window.tambahLine = tambahLine;
-    window.hitungDanSimpan = hitungDanSimpan;
-    window.resetFilter = resetFilter;
+    loadOEEList(); loadListrikList(); loadPamList(); updateDashboard();
 </script>
 </body>
 </html>
