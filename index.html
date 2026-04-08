@@ -22,6 +22,7 @@
             margin: 0 auto;
         }
 
+        /* Header & Navigasi */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -60,9 +61,14 @@
             color: #667eea;
         }
 
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
@@ -87,6 +93,27 @@
             color: #667eea;
         }
 
+        /* Filter Bar */
+        .filter-bar {
+            padding: 15px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-bar input, .filter-bar select {
+            width: auto;
+            min-width: 150px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Tables */
         .data-table {
             background: white;
             border-radius: 10px;
@@ -119,6 +146,7 @@
             background: #f5f5f5;
         }
 
+        /* Forms */
         .form-card {
             background: white;
             border-radius: 10px;
@@ -157,12 +185,21 @@
             margin-right: 10px;
         }
 
+        button.danger {
+            background: #dc3545;
+        }
+
+        button.success {
+            background: #28a745;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
         }
 
+        /* Tab Content */
         .tab-content {
             display: none;
         }
@@ -171,6 +208,7 @@
             display: block;
         }
 
+        /* Badges */
         .badge {
             padding: 4px 8px;
             border-radius: 5px;
@@ -200,20 +238,6 @@
             font-size: 12px;
         }
 
-        .filter-bar {
-            padding: 15px;
-            background: #f8f9fa;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .filter-bar input, .filter-bar select {
-            width: auto;
-            min-width: 150px;
-        }
-
         .jumlah-data {
             padding: 10px 15px;
             background: #e9ecef;
@@ -221,8 +245,13 @@
             font-weight: bold;
         }
 
-        .btn-reset {
-            background: #6c757d;
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
         }
     </style>
 </head>
@@ -238,7 +267,7 @@
         </div>
     </div>
 
-    <!-- Dashboard Tab -->
+    <!-- ==================== TAB 1: DASHBOARD ==================== -->
     <div id="dashboard" class="tab-content active">
         <div class="stats-grid" id="statsGrid"></div>
         
@@ -249,12 +278,11 @@
             <select id="filterLine" onchange="renderOEETable()">
                 <option value="">Semua Line</option>
             </select>
-            <button class="btn-reset" onclick="resetFilter()">Reset Filter</button>
-            <button onclick="resetAllData()" style="background:#dc3545;">Reset Semua Data</button>
+            <button onclick="resetFilter()">Reset Filter</button>
         </div>
 
         <div class="data-table">
-            <div style="padding: 15px; background: #f8f9fa; display: flex; justify-content: space-between; align-items: center;">
+            <div class="header-info">
                 <h3>📋 Data OEE Lengkap</h3>
                 <span class="jumlah-data" id="jumlahData">0 data</span>
             </div>
@@ -266,14 +294,13 @@
                             <th>Reject</th><th>OEE</th><th>Availability</th><th>Performance</th><th>Quality</th><th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="oeeTableBody">
-                    </tbody>
+                    <tbody id="oeeTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Input Form Tab -->
+    <!-- ==================== TAB 2: INPUT OEE ==================== -->
     <div id="input" class="tab-content">
         <div class="form-card">
             <h3>📝 Form Input OEE</h3>
@@ -309,7 +336,7 @@
         </div>
     </div>
 
-    <!-- Kelola Mesin Tab -->
+    <!-- ==================== TAB 3: KELOLA MESIN ==================== -->
     <div id="mesin" class="tab-content">
         <div class="form-card">
             <h3>➕ Tambah Line/Mesin Baru</h3>
@@ -327,7 +354,7 @@
         </div>
     </div>
 
-    <!-- Audit Trail Tab -->
+    <!-- ==================== TAB 4: AUDIT TRAIL ==================== -->
     <div id="audit" class="tab-content">
         <div class="data-table">
             <h3 style="padding: 15px;">📜 Riwayat Audit Trail</h3>
@@ -340,31 +367,31 @@
 </div>
 
 <script>
-    // ==================== DATA DUMMY 23 RECORD LENGKAP ====================
+    // ==================== DATA OEE LENGKAP (23 RECORD) ====================
     const dummyDataOEE = [
-        {id:1,tanggal:"2025-12-27",line_id:2,jam_kerja:900,produk_variant:"Kaldu Sapi",pack_vol:"8gr",target:480,hasil_fg:389,reject:4347,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:362,pdt:273,speed_avg:50,jam_kerja_per_line:600,total_fg_pcs:186720,total_fg_ton:1.5087,hasil_fg_line:389,isi_1_dus_avg:480,reject_per_line:4347,achievement:81.04,availability:89.94,performance:103.73,quality:97.72,oee:91.18},
-        {id:2,tanggal:"2025-12-26",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Sapi",pack_vol:"8gr",target:675,hasil_fg:710,reject:10000,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:795,pdt:402,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:340800,total_fg_ton:2.7537,hasil_fg_line:710,isi_1_dus_avg:480,reject_per_line:10000,achievement:105.19,availability:89.48,performance:90.16,quality:97.15,oee:78.38},
-        {id:3,tanggal:"2025-12-24",line_id:2,jam_kerja:780,produk_variant:"Kaldu Sapi",pack_vol:"8gr",target:480,hasil_fg:376,reject:7167,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1392,pdt:217,speed_avg:50,jam_kerja_per_line:780,total_fg_pcs:180480,total_fg_ton:1.4583,hasil_fg_line:376,isi_1_dus_avg:480,reject_per_line:7167,achievement:78.33,availability:70.26,performance:77.13,quality:96.18,oee:52.12},
-        {id:4,tanggal:"2025-12-23",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Sapi",pack_vol:"8gr",target:675,hasil_fg:706,reject:12010,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1197,pdt:351,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:338880,total_fg_ton:2.7382,hasil_fg_line:706,isi_1_dus_avg:480,reject_per_line:12010,achievement:104.59,availability:84.17,performance:89.65,quality:96.58,oee:72.87},
-        {id:5,tanggal:"2025-12-22",line_id:2,jam_kerja:930,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:480,hasil_fg:510,reject:10303,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:627,pdt:306,speed_avg:50,jam_kerja_per_line:930,total_fg_pcs:244800,total_fg_ton:1.9780,hasil_fg_line:510,isi_1_dus_avg:480,reject_per_line:10303,achievement:106.25,availability:88.76,performance:87.74,quality:95.96,oee:74.74},
-        {id:6,tanggal:"2025-12-20",line_id:2,jam_kerja:840,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:450,hasil_fg:473,reject:8585,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:366,pdt:100,speed_avg:50,jam_kerja_per_line:840,total_fg_pcs:227040,total_fg_ton:1.8345,hasil_fg_line:473,isi_1_dus_avg:480,reject_per_line:8585,achievement:105.11,availability:92.74,performance:90.10,quality:96.36,oee:80.51},
-        {id:7,tanggal:"2025-12-19",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:732,reject:10346,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:675,pdt:428,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:351360,total_fg_ton:2.8390,hasil_fg_line:732,isi_1_dus_avg:480,reject_per_line:10346,achievement:108.44,availability:91.07,performance:92.95,quality:97.14,oee:82.23},
-        {id:8,tanggal:"2025-12-18",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:654,reject:17990,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1490,pdt:358,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:313920,total_fg_ton:2.5365,hasil_fg_line:654,isi_1_dus_avg:480,reject_per_line:17990,achievement:96.89,availability:80.29,performance:83.05,quality:94.58,oee:63.07},
-        {id:9,tanggal:"2025-12-17",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:657,reject:15491,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1418,pdt:388,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:315360,total_fg_ton:2.5481,hasil_fg_line:657,isi_1_dus_avg:480,reject_per_line:15491,achievement:97.33,availability:81.24,performance:83.43,quality:95.32,oee:64.61},
-        {id:10,tanggal:"2025-12-16",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:643,reject:13238,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1048,pdt:355,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:308640,total_fg_ton:2.4938,hasil_fg_line:643,isi_1_dus_avg:480,reject_per_line:13238,achievement:95.26,availability:86.14,performance:81.65,quality:95.89,oee:67.44},
-        {id:11,tanggal:"2025-12-15",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:560,hasil_fg:608,reject:15841,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1694,pdt:365,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:291840,total_fg_ton:2.3581,hasil_fg_line:608,isi_1_dus_avg:480,reject_per_line:15841,achievement:108.57,availability:73.11,performance:77.21,quality:94.85,oee:53.54},
-        {id:12,tanggal:"2025-12-13",line_id:2,jam_kerja:900,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:480,hasil_fg:423,reject:8789,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1889,pdt:232,speed_avg:50,jam_kerja_per_line:810,total_fg_pcs:203040,total_fg_ton:1.6406,hasil_fg_line:423,isi_1_dus_avg:480,reject_per_line:8789,achievement:88.13,availability:61.13,performance:83.56,quality:95.85,oee:48.96},
-        {id:13,tanggal:"2025-12-12",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:563,reject:11311,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:2238,pdt:361,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:270240,total_fg_ton:2.1835,hasil_fg_line:563,isi_1_dus_avg:480,reject_per_line:11311,achievement:83.41,availability:70.40,performance:71.49,quality:95.98,oee:48.31},
-        {id:14,tanggal:"2025-12-11",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:632,reject:10796,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:2020,pdt:116,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:303360,total_fg_ton:2.4511,hasil_fg_line:632,isi_1_dus_avg:480,reject_per_line:10796,achievement:93.63,availability:73.28,performance:80.25,quality:96.56,oee:56.79},
-        {id:15,tanggal:"2025-12-10",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:732,reject:10012,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1090,pdt:495,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:351360,total_fg_ton:2.8390,hasil_fg_line:732,isi_1_dus_avg:480,reject_per_line:10012,achievement:108.44,availability:85.58,performance:92.95,quality:97.23,oee:77.35},
-        {id:16,tanggal:"2025-12-09",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:730,reject:14948,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1089,pdt:380,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:350400,total_fg_ton:2.8312,hasil_fg_line:730,isi_1_dus_avg:480,reject_per_line:14948,achievement:108.15,availability:85.60,performance:92.70,quality:95.91,oee:76.10},
-        {id:17,tanggal:"2025-12-08",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:726,reject:12006,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:991,pdt:374,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:348480,total_fg_ton:2.8157,hasil_fg_line:726,isi_1_dus_avg:480,reject_per_line:12006,achievement:107.56,availability:86.89,performance:92.19,quality:96.67,oee:77.44},
-        {id:18,tanggal:"2025-12-06",line_id:2,jam_kerja:810,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:480,hasil_fg:495,reject:7734,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:238,pdt:50,speed_avg:50,jam_kerja_per_line:810,total_fg_pcs:237600,total_fg_ton:1.9198,hasil_fg_line:495,isi_1_dus_avg:480,reject_per_line:7734,achievement:103.13,availability:95.10,performance:97.78,quality:96.85,oee:90.06},
-        {id:19,tanggal:"2025-12-05",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:737,reject:8469,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:489,pdt:162,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:353760,total_fg_ton:2.8584,hasil_fg_line:737,isi_1_dus_avg:480,reject_per_line:8469,achievement:109.19,availability:93.53,performance:93.59,quality:97.66,oee:85.49},
-        {id:20,tanggal:"2025-12-04",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:739,reject:11639,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:838,pdt:291,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:354720,total_fg_ton:2.8661,hasil_fg_line:739,isi_1_dus_avg:480,reject_per_line:11639,achievement:109.48,availability:88.92,performance:93.84,quality:96.82,oee:80.79},
-        {id:21,tanggal:"2025-12-03",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:766,reject:12241,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:719,pdt:248,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:367680,total_fg_ton:2.9709,hasil_fg_line:766,isi_1_dus_avg:480,reject_per_line:12241,achievement:113.48,availability:90.49,performance:97.27,quality:96.78,oee:85.18},
-        {id:22,tanggal:"2025-12-02",line_id:2,jam_kerja:1260,produk_variant:"Kaldu Ayam",pack_vol:"8gr",target:675,hasil_fg:738,reject:12391,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:667,pdt:237,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:354240,total_fg_ton:2.8623,hasil_fg_line:738,isi_1_dus_avg:480,reject_per_line:12391,achievement:109.33,availability:91.18,performance:93.71,quality:96.62,oee:82.56},
-        {id:23,tanggal:"2025-12-01",line_id:2,jam_kerja:900,produk_variant:"Kaldu Sapi",pack_vol:"8gr",target:480,hasil_fg:478,reject:9521,man_power:31,speed_lhp:50,isi_1_dus_pcs:480,dt_all:1004,pdt:364,speed_avg:50,jam_kerja_per_line:900,total_fg_pcs:229440,total_fg_ton:1.8539,hasil_fg_line:478,isi_1_dus_avg:480,reject_per_line:9521,achievement:99.58,availability:81.41,performance:84.98,quality:96.02,oee:66.42}
+        {id:1,tanggal:"2025-12-27",line_id:2,produk_variant:"Kaldu Sapi",target:480,hasil_fg:389,reject:4347,oee:91.18,availability:89.94,performance:103.73,quality:97.72,jam_kerja:900,isi_1_dus_pcs:480,dt_all:362,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:273,speed_avg:50,jam_kerja_per_line:600,total_fg_pcs:186720,total_fg_ton:1.5087,achievement:81.04},
+        {id:2,tanggal:"2025-12-26",line_id:2,produk_variant:"Kaldu Sapi",target:675,hasil_fg:710,reject:10000,oee:78.38,availability:89.48,performance:90.16,quality:97.15,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:795,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:402,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:340800,total_fg_ton:2.7537,achievement:105.19},
+        {id:3,tanggal:"2025-12-24",line_id:2,produk_variant:"Kaldu Sapi",target:480,hasil_fg:376,reject:7167,oee:52.12,availability:70.26,performance:77.13,quality:96.18,jam_kerja:780,isi_1_dus_pcs:480,dt_all:1392,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:217,speed_avg:50,jam_kerja_per_line:780,total_fg_pcs:180480,total_fg_ton:1.4583,achievement:78.33},
+        {id:4,tanggal:"2025-12-23",line_id:2,produk_variant:"Kaldu Sapi",target:675,hasil_fg:706,reject:12010,oee:72.87,availability:84.17,performance:89.65,quality:96.58,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1197,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:351,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:338880,total_fg_ton:2.7382,achievement:104.59},
+        {id:5,tanggal:"2025-12-22",line_id:2,produk_variant:"Kaldu Ayam",target:480,hasil_fg:510,reject:10303,oee:74.74,availability:88.76,performance:87.74,quality:95.96,jam_kerja:930,isi_1_dus_pcs:480,dt_all:627,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:306,speed_avg:50,jam_kerja_per_line:930,total_fg_pcs:244800,total_fg_ton:1.9780,achievement:106.25},
+        {id:6,tanggal:"2025-12-20",line_id:2,produk_variant:"Kaldu Ayam",target:450,hasil_fg:473,reject:8585,oee:80.51,availability:92.74,performance:90.10,quality:96.36,jam_kerja:840,isi_1_dus_pcs:480,dt_all:366,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:100,speed_avg:50,jam_kerja_per_line:840,total_fg_pcs:227040,total_fg_ton:1.8345,achievement:105.11},
+        {id:7,tanggal:"2025-12-19",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:732,reject:10346,oee:82.23,availability:91.07,performance:92.95,quality:97.14,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:675,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:428,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:351360,total_fg_ton:2.8390,achievement:108.44},
+        {id:8,tanggal:"2025-12-18",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:654,reject:17990,oee:63.07,availability:80.29,performance:83.05,quality:94.58,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1490,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:358,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:313920,total_fg_ton:2.5365,achievement:96.89},
+        {id:9,tanggal:"2025-12-17",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:657,reject:15491,oee:64.61,availability:81.24,performance:83.43,quality:95.32,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1418,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:388,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:315360,total_fg_ton:2.5481,achievement:97.33},
+        {id:10,tanggal:"2025-12-16",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:643,reject:13238,oee:67.44,availability:86.14,performance:81.65,quality:95.89,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1048,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:355,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:308640,total_fg_ton:2.4938,achievement:95.26},
+        {id:11,tanggal:"2025-12-15",line_id:2,produk_variant:"Kaldu Ayam",target:560,hasil_fg:608,reject:15841,oee:53.54,availability:73.11,performance:77.21,quality:94.85,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1694,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:365,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:291840,total_fg_ton:2.3581,achievement:108.57},
+        {id:12,tanggal:"2025-12-13",line_id:2,produk_variant:"Kaldu Ayam",target:480,hasil_fg:423,reject:8789,oee:48.96,availability:61.13,performance:83.56,quality:95.85,jam_kerja:900,isi_1_dus_pcs:480,dt_all:1889,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:232,speed_avg:50,jam_kerja_per_line:810,total_fg_pcs:203040,total_fg_ton:1.6406,achievement:88.13},
+        {id:13,tanggal:"2025-12-12",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:563,reject:11311,oee:48.31,availability:70.40,performance:71.49,quality:95.98,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:2238,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:361,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:270240,total_fg_ton:2.1835,achievement:83.41},
+        {id:14,tanggal:"2025-12-11",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:632,reject:10796,oee:56.79,availability:73.28,performance:80.25,quality:96.56,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:2020,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:116,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:303360,total_fg_ton:2.4511,achievement:93.63},
+        {id:15,tanggal:"2025-12-10",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:732,reject:10012,oee:77.35,availability:85.58,performance:92.95,quality:97.23,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1090,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:495,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:351360,total_fg_ton:2.8390,achievement:108.44},
+        {id:16,tanggal:"2025-12-09",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:730,reject:14948,oee:76.10,availability:85.60,performance:92.70,quality:95.91,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:1089,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:380,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:350400,total_fg_ton:2.8312,achievement:108.15},
+        {id:17,tanggal:"2025-12-08",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:726,reject:12006,oee:77.44,availability:86.89,performance:92.19,quality:96.67,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:991,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:374,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:348480,total_fg_ton:2.8157,achievement:107.56},
+        {id:18,tanggal:"2025-12-06",line_id:2,produk_variant:"Kaldu Ayam",target:480,hasil_fg:495,reject:7734,oee:90.06,availability:95.10,performance:97.78,quality:96.85,jam_kerja:810,isi_1_dus_pcs:480,dt_all:238,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:50,speed_avg:50,jam_kerja_per_line:810,total_fg_pcs:237600,total_fg_ton:1.9198,achievement:103.13},
+        {id:19,tanggal:"2025-12-05",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:737,reject:8469,oee:85.49,availability:93.53,performance:93.59,quality:97.66,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:489,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:162,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:353760,total_fg_ton:2.8584,achievement:109.19},
+        {id:20,tanggal:"2025-12-04",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:739,reject:11639,oee:80.79,availability:88.92,performance:93.84,quality:96.82,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:838,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:291,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:354720,total_fg_ton:2.8661,achievement:109.48},
+        {id:21,tanggal:"2025-12-03",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:766,reject:12241,oee:85.18,availability:90.49,performance:97.27,quality:96.78,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:719,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:248,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:367680,total_fg_ton:2.9709,achievement:113.48},
+        {id:22,tanggal:"2025-12-02",line_id:2,produk_variant:"Kaldu Ayam",target:675,hasil_fg:738,reject:12391,oee:82.56,availability:91.18,performance:93.71,quality:96.62,jam_kerja:1260,isi_1_dus_pcs:480,dt_all:667,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:237,speed_avg:50,jam_kerja_per_line:1260,total_fg_pcs:354240,total_fg_ton:2.8623,achievement:109.33},
+        {id:23,tanggal:"2025-12-01",line_id:2,produk_variant:"Kaldu Sapi",target:480,hasil_fg:478,reject:9521,oee:66.42,availability:81.41,performance:84.98,quality:96.02,jam_kerja:900,isi_1_dus_pcs:480,dt_all:1004,man_power:31,speed_lhp:50,pack_vol:"8gr",pdt:364,speed_avg:50,jam_kerja_per_line:900,total_fg_pcs:229440,total_fg_ton:1.8539,achievement:99.58}
     ];
 
     // Global variables
@@ -373,65 +400,29 @@
     let auditTrail = [];
     let nextId = 24;
 
-    // Reset semua data ke dummy
-    function resetAllData() {
-        if(confirm('Yakin reset semua data? Data yang sudah ditambahkan akan hilang!')) {
-            dataOEE = JSON.parse(JSON.stringify(dummyDataOEE));
-            dataLine = [
-                {id: 1, nama: 'Line 1', aktif: true},
-                {id: 2, nama: 'Line 2', aktif: true},
-                {id: 3, nama: 'Line 3', aktif: true}
-            ];
-            auditTrail = [{
-                id: 1, waktu: new Date().toISOString(), user: 'system', aksi: 'RESET', detail: 'Database direset ke data awal (23 record)'
-            }];
-            nextId = 24;
-            simpanKeLocalStorage();
-            renderAll();
-            alert('Data berhasil direset! Sekarang ada ' + dataOEE.length + ' data OEE.');
-        }
+    // Initialize data
+    function initData() {
+        // Langsung pake dummy data
+        dataOEE = JSON.parse(JSON.stringify(dummyDataOEE));
+        nextId = 24;
+        
+        dataLine = [
+            {id: 1, nama: 'Line 1', aktif: true},
+            {id: 2, nama: 'Line 2', aktif: true},
+            {id: 3, nama: 'Line 3', aktif: true}
+        ];
+        
+        auditTrail = [{
+            id: 1, waktu: new Date().toISOString(), user: 'system', aksi: 'INIT', detail: 'Database OEE dengan 23 record'
+        }];
+        
+        simpanKeLocalStorage();
     }
 
-    // Simpan ke localStorage
     function simpanKeLocalStorage() {
         localStorage.setItem('oee_data', JSON.stringify(dataOEE));
         localStorage.setItem('line_data', JSON.stringify(dataLine));
         localStorage.setItem('audit_data', JSON.stringify(auditTrail));
-    }
-
-    // Load data dari localStorage atau dummy
-    function loadData() {
-        const storedOEE = localStorage.getItem('oee_data');
-        const storedLine = localStorage.getItem('line_data');
-        const storedAudit = localStorage.getItem('audit_data');
-        
-        if(storedOEE && JSON.parse(storedOEE).length > 0) {
-            dataOEE = JSON.parse(storedOEE);
-            nextId = Math.max(...dataOEE.map(d => d.id), 0) + 1;
-        } else {
-            dataOEE = JSON.parse(JSON.stringify(dummyDataOEE));
-            nextId = 24;
-        }
-        
-        if(storedLine && JSON.parse(storedLine).length > 0) {
-            dataLine = JSON.parse(storedLine);
-        } else {
-            dataLine = [
-                {id: 1, nama: 'Line 1', aktif: true},
-                {id: 2, nama: 'Line 2', aktif: true},
-                {id: 3, nama: 'Line 3', aktif: true}
-            ];
-        }
-        
-        if(storedAudit && JSON.parse(storedAudit).length > 0) {
-            auditTrail = JSON.parse(storedAudit);
-        } else {
-            auditTrail = [{
-                id: 1, waktu: new Date().toISOString(), user: 'system', aksi: 'INIT', detail: 'Database OEE diinisialisasi dengan 23 record'
-            }];
-        }
-        
-        simpanKeLocalStorage();
     }
 
     function addAudit(user, aksi, detail) {
@@ -454,6 +445,7 @@
 
     function hitungDanSimpan() {
         const lineId = parseInt(document.getElementById('line_id').value);
+        
         const newData = {
             id: nextId++,
             tanggal: document.getElementById('tanggal').value,
@@ -473,7 +465,7 @@
             jam_kerja_per_line: parseInt(document.getElementById('jam_kerja_per_line').value) || 0
         };
 
-        if(!newData.tanggal || !newData.line_id || !newData.jam_kerja || !newData.target || !newData.hasil_fg) {
+        if(!newData.tanggal || !newData.jam_kerja || !newData.target || !newData.hasil_fg) {
             alert('Harap isi field yang wajib (*)');
             return;
         }
@@ -495,10 +487,7 @@
             availability: parseFloat(availability.toFixed(2)),
             performance: parseFloat(performance.toFixed(2)),
             quality: parseFloat(quality.toFixed(2)),
-            oee: parseFloat(oee.toFixed(2)),
-            hasil_fg_line: newData.hasil_fg,
-            isi_1_dus_avg: newData.isi_1_dus_pcs,
-            reject_per_line: newData.reject
+            oee: parseFloat(oee.toFixed(2))
         };
 
         dataOEE.push(finalData);
@@ -507,14 +496,14 @@
         alert(`Data berhasil disimpan!\nOEE: ${finalData.oee}%`);
         document.getElementById('oeeForm').reset();
         renderAll();
-        showTab('dashboard', null);
+        showTab('dashboard', document.querySelector('.tab-btn'));
     }
 
     function hapusDataOEE(id) {
         if(confirm('Yakin hapus data ini?')) {
             const deleted = dataOEE.find(d => d.id == id);
             dataOEE = dataOEE.filter(d => d.id != id);
-            addAudit('admin', 'DELETE', `Menghapus data OEE untuk ${getLineName(deleted.line_id)} tgl ${deleted.tanggal} (OEE: ${deleted.oee}%)`);
+            addAudit('admin', 'DELETE', `Menghapus data OEE untuk ${getLineName(deleted.line_id)} tgl ${deleted.tanggal}`);
             simpanKeLocalStorage();
             renderAll();
         }
@@ -552,7 +541,7 @@
         const avgPerf = dataOEE.reduce((sum, d) => sum + d.performance, 0) / dataOEE.length;
         const avgQual = dataOEE.reduce((sum, d) => sum + d.quality, 0) / dataOEE.length;
         const totalReject = dataOEE.reduce((sum, d) => sum + d.reject, 0);
-        const totalProduksi = dataOEE.reduce((sum, d) => sum + d.total_fg_pcs, 0);
+        const totalProduksi = dataOEE.reduce((sum, d) => sum + (d.hasil_fg * d.isi_1_dus_pcs), 0);
         const bestOEE = Math.max(...dataOEE.map(d => d.oee));
         const worstOEE = Math.min(...dataOEE.map(d => d.oee));
 
@@ -589,12 +578,11 @@
         
         filteredData.sort((a,b) => b.tanggal.localeCompare(a.tanggal));
         
-        const jumlahSpan = document.getElementById('jumlahData');
-        if(jumlahSpan) jumlahSpan.innerText = filteredData.length + ' data';
+        document.getElementById('jumlahData').innerText = filteredData.length + ' data';
         
         tbody.innerHTML = '';
         if(filteredData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">Tidak ada data</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">Tidak ada数据</td></tr>';
             return;
         }
         
@@ -700,18 +688,17 @@
         renderAll();
     }
 
-    // Inisialisasi
-    loadData();
+    // Start the app
+    initData();
     renderAll();
     
-    // Expose functions ke global
+    // Expose functions
     window.showTab = showTab;
     window.hapusDataOEE = hapusDataOEE;
     window.toggleLineStatus = toggleLineStatus;
     window.tambahLine = tambahLine;
     window.hitungDanSimpan = hitungDanSimpan;
     window.resetFilter = resetFilter;
-    window.resetAllData = resetAllData;
 </script>
 </body>
 </html>
