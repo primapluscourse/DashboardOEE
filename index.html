@@ -129,6 +129,11 @@
             font-size: 14px;
         }
 
+        .form-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
         .btn-submit {
             background: #2a5298;
             color: white;
@@ -255,6 +260,34 @@
         .input-panel.active {
             display: block;
         }
+
+        .info-hitung {
+            background: #e8f4f8;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #1e3c72;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .hasil-otomatis {
+            background: #f0fdf4;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #22c55e;
+        }
+
+        .hasil-otomatis p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .readonly-input {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -295,7 +328,6 @@
 
     <!-- ==================== TAB INPUT ==================== -->
     <div id="tab-input" class="tab-content">
-        <!-- Sub Navigation untuk Input -->
         <div class="input-subnav">
             <button class="input-nav-btn active" onclick="switchInputPanel('oee')">🏭 OEE Production</button>
             <button class="input-nav-btn" onclick="switchInputPanel('listrik')">⚡ Listrik</button>
@@ -307,9 +339,9 @@
             <div class="card">
                 <div class="card-title">📝 Input Data Produksi Harian</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>Tanggal</label><input type="date" id="tgl" value="2025-12-27"></div>
-                    <div class="form-group"><label>Line</label><select id="line"><option value="Line 1">Line 1 (Seasoning)</option><option value="Line 2">Line 2 (Kaldu)</option></select></div>
-                    <div class="form-group"><label>Produk Variant</label><select id="produk"><option value="Kaldu Sapi">Kaldu Sapi</option><option value="Kaldu Ayam">Kaldu Ayam</option></select></div>
+                    <div class="form-group"><label>Tanggal</label><input type="date" id="tgl" value=""></div>
+                    <div class="form-group"><label>Line</label><select id="line"><option value="">Pilih Line</option><option value="Line 1">Line 1 (Seasoning)</option><option value="Line 2">Line 2 (Kaldu)</option></select></div>
+                    <div class="form-group"><label>Produk Variant</label><select id="produk"><option value="">Pilih Produk</option><option value="Kaldu Sapi">Kaldu Sapi</option><option value="Kaldu Ayam">Kaldu Ayam</option></select></div>
                     <div class="form-group"><label>Jam Kerja (menit)</label><input type="number" id="jamKerja" placeholder="Total menit kerja"></div>
                     <div class="form-group"><label>Target (dus)</label><input type="number" id="target" placeholder="Target produksi dus"></div>
                     <div class="form-group"><label>Hasil FG (dus)</label><input type="number" id="hasilFg" placeholder="Hasil jadi dalam dus"></div>
@@ -336,23 +368,56 @@
         <div id="input-listrik" class="input-panel">
             <div class="card">
                 <div class="card-title">⚡ Input Pemakaian Listrik (Periode Start - End)</div>
+                <div class="info-hitung">
+                    💡 <strong>Cara input:</strong> Isi variabel dasar (rate × jumlah), sistem akan menghitung Total kWh otomatis sesuai rumus di sheet existing.
+                </div>
                 <div class="periode-range">
-                    <div class="form-group"><label>Periode Start</label><input type="date" id="listrikStart"></div>
-                    <div class="form-group"><label>Periode End</label><input type="date" id="listrikEnd"></div>
+                    <div class="form-group"><label>Periode Start</label><input type="date" id="listrikStart" onchange="hitungTotalListrik()"></div>
+                    <div class="form-group"><label>Periode End</label><input type="date" id="listrikEnd" onchange="hitungTotalListrik()"></div>
                 </div>
                 
                 <div class="section-title">🔧 MESIN PRODUKSI</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>Mixing Reborn (kWh)</label><input type="number" id="kwhMixing" step="0.01" placeholder="Total kWh"></div>
-                    <div class="form-group"><label>Screw Transfer (kWh)</label><input type="number" id="kwhTransfer" step="0.01" placeholder="Total kWh"></div>
-                    <div class="form-group"><label>Filling Line 1 - Seasoning (kWh)</label><input type="number" id="kwhFilling1" step="0.01" placeholder="Total kWh"></div>
-                    <div class="form-group"><label>Filling Line 2 - Kaldu (kWh)</label><input type="number" id="kwhFilling2" step="0.01" placeholder="Total kWh"></div>
+                    <div class="form-group"><label>Mixing reborn (kWh per blend)</label><input type="number" id="mixingReborn" step="0.01" placeholder="cth: 2.6" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label>Jumlah blend</label><input type="number" id="jumlahBlend" step="1" placeholder="cth: 111" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label style="background:#e8f4f8; padding:5px;">→ Total Kwh Mixing</label><input type="text" id="totalKwhMixing" readonly class="readonly-input" placeholder="0"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Screw Transfer (kWh per blend)</label><input type="number" id="screwTransfer" step="0.01" placeholder="cth: 1.3" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label>Jumlah blend (sama)</label><input type="number" id="jumlahBlendTransfer" step="1" placeholder="cth: 111" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label style="background:#e8f4f8; padding:5px;">→ Total Kwh Transfer</label><input type="text" id="totalKwhTransfer" readonly class="readonly-input" placeholder="0"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Filling Line 1 (kWh per jam)</label><input type="number" id="fillingLine1Rate" step="0.01" placeholder="cth: 2.7" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label>Lama aktif Line 1 (jam)</label><input type="number" id="lamaAktifLine1" step="0.1" placeholder="cth: 350" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label style="background:#e8f4f8; padding:5px;">→ Total Kwh Line 1</label><input type="text" id="totalKwhLine1" readonly class="readonly-input" placeholder="0"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Filling Line 2 (kWh per jam)</label><input type="number" id="fillingLine2Rate" step="0.01" placeholder="cth: 3.3" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label>Lama aktif Line 2 (jam)</label><input type="number" id="lamaAktifLine2" step="0.1" placeholder="cth: 406" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label style="background:#e8f4f8; padding:5px;">→ Total Kwh Line 2</label><input type="text" id="totalKwhLine2" readonly class="readonly-input" placeholder="0"></div>
                 </div>
                 
                 <div class="section-title">⚙️ UTILITY</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>Compressor (kWh)</label><input type="number" id="kwhComp" step="0.01" placeholder="Total kWh"></div>
-                    <div class="form-group"><label>HVAC (kWh)</label><input type="number" id="kwhHvac" step="0.01" placeholder="Total kWh"></div>
+                    <div class="form-group"><label>HVAC (kWh per jam)</label><input type="number" id="hvacRate" step="0.01" placeholder="cth: 23.5" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label>Lama aktif HVAC (jam)</label><input type="number" id="lamaAktifHvac" step="0.1" placeholder="cth: 507" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label style="background:#e8f4f8; padding:5px;">→ Total Kwh HVAC</label><input type="text" id="totalKwhHvac" readonly class="readonly-input" placeholder="0"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Kompresor (kWh per jam)</label><input type="number" id="kompresorRate" step="0.01" placeholder="cth: 6.6" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label>Lama aktif Kompresor (jam)</label><input type="number" id="lamaAktifKompresor" step="0.1" placeholder="cth: 507" oninput="hitungTotalListrik()"></div>
+                    <div class="form-group"><label style="background:#e8f4f8; padding:5px;">→ Total Kwh Kompresor</label><input type="text" id="totalKwhKompresor" readonly class="readonly-input" placeholder="0"></div>
+                </div>
+
+                <div class="hasil-otomatis" id="hasilOtomatisListrik">
+                    <p><strong>📊 Ringkasan Perhitungan Otomatis:</strong></p>
+                    <p>Total Kwh Mixing: <span id="summaryMixing">0</span> | Total Kwh Transfer: <span id="summaryTransfer">0</span></p>
+                    <p>Total Kwh Line 1: <span id="summaryLine1">0</span> | Total Kwh Line 2: <span id="summaryLine2">0</span></p>
+                    <p>Total Kwh HVAC: <span id="summaryHvac">0</span> | Total Kwh Kompresor: <span id="summaryKompresor">0</span></p>
+                    <p>Total Mesin Produksi: <strong id="summaryTotalMesin">0</strong> kWh</p>
+                    <p>Total Utility: <strong id="summaryUtility">0</strong> kWh</p>
+                    <p style="font-size:16px; margin-top:10px;">🎯 GRAND TOTAL: <strong id="summaryGrandTotal" style="color:#2a5298; font-size:20px;">0</strong> kWh</p>
                 </div>
                 
                 <button class="btn-submit" onclick="simpanListrik()">💾 Simpan Data Listrik Periode</button>
@@ -409,6 +474,62 @@
 </div>
 
 <script>
+    // ============ FUNGSI HITUNG LISTRIK OTOMATIS ============
+    function hitungTotalListrik() {
+        // MESIN PRODUKSI
+        let mixingReborn = parseFloat(document.getElementById('mixingReborn').value) || 0;
+        let jumlahBlend = parseFloat(document.getElementById('jumlahBlend').value) || 0;
+        let totalMixing = mixingReborn * jumlahBlend;
+        document.getElementById('totalKwhMixing').value = totalMixing.toFixed(2);
+        
+        let screwTransfer = parseFloat(document.getElementById('screwTransfer').value) || 0;
+        let jumlahBlendTransfer = parseFloat(document.getElementById('jumlahBlendTransfer').value) || 0;
+        let totalTransfer = screwTransfer * jumlahBlendTransfer;
+        document.getElementById('totalKwhTransfer').value = totalTransfer.toFixed(2);
+        
+        let filling1Rate = parseFloat(document.getElementById('fillingLine1Rate').value) || 0;
+        let lamaAktif1 = parseFloat(document.getElementById('lamaAktifLine1').value) || 0;
+        let totalLine1 = filling1Rate * lamaAktif1;
+        document.getElementById('totalKwhLine1').value = totalLine1.toFixed(2);
+        
+        let filling2Rate = parseFloat(document.getElementById('fillingLine2Rate').value) || 0;
+        let lamaAktif2 = parseFloat(document.getElementById('lamaAktifLine2').value) || 0;
+        let totalLine2 = filling2Rate * lamaAktif2;
+        document.getElementById('totalKwhLine2').value = totalLine2.toFixed(2);
+        
+        // UTILITY
+        let hvacRate = parseFloat(document.getElementById('hvacRate').value) || 0;
+        let lamaAktifHvac = parseFloat(document.getElementById('lamaAktifHvac').value) || 0;
+        let totalHvac = hvacRate * lamaAktifHvac;
+        document.getElementById('totalKwhHvac').value = totalHvac.toFixed(2);
+        
+        let kompresorRate = parseFloat(document.getElementById('kompresorRate').value) || 0;
+        let lamaAktifKompresor = parseFloat(document.getElementById('lamaAktifKompresor').value) || 0;
+        let totalKompresor = kompresorRate * lamaAktifKompresor;
+        document.getElementById('totalKwhKompresor').value = totalKompresor.toFixed(2);
+        
+        // TOTAL
+        let totalMesin = totalMixing + totalTransfer + totalLine1 + totalLine2;
+        let totalUtility = totalHvac + totalKompresor;
+        let grandTotal = totalMesin + totalUtility;
+        
+        // Update summary
+        document.getElementById('summaryMixing').innerText = totalMixing.toFixed(2);
+        document.getElementById('summaryTransfer').innerText = totalTransfer.toFixed(2);
+        document.getElementById('summaryLine1').innerText = totalLine1.toFixed(2);
+        document.getElementById('summaryLine2').innerText = totalLine2.toFixed(2);
+        document.getElementById('summaryHvac').innerText = totalHvac.toFixed(2);
+        document.getElementById('summaryKompresor').innerText = totalKompresor.toFixed(2);
+        document.getElementById('summaryTotalMesin').innerText = totalMesin.toFixed(2);
+        document.getElementById('summaryUtility').innerText = totalUtility.toFixed(2);
+        document.getElementById('summaryGrandTotal').innerText = grandTotal.toFixed(2);
+        
+        return {
+            totalMixing, totalTransfer, totalLine1, totalLine2, totalHvac, totalKompresor,
+            totalMesin, totalUtility, grandTotal
+        };
+    }
+
     // ============ INITIAL DATA ============
     function initData() {
         if (!localStorage.getItem('masterHarga')) {
@@ -475,7 +596,7 @@
 
     function loadAuditList() {
         let audit = JSON.parse(localStorage.getItem('auditTrail') || '[]');
-        let html = `<table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Nilai Lama</th><th>Nilai Baru</th><th>Keterangan</th><th>User</th></tr></thead><tbody>`;
+        let html = ` <thead><tr><th>Tanggal</th><th>Jenis</th><th>Nilai Lama</th><th>Nilai Baru</th><th>Keterangan</th><th>User</th></tr></thead><tbody>`;
         audit.forEach(a => {
             html += `<tr><td>${a.tanggal}</td><td>${a.jenis}</td><td>${a.oldValue}</td><td>${a.newValue}</td><td>${a.keterangan}</td><td>${a.user}</td></tr>`;
         });
@@ -488,7 +609,6 @@
         let jamKerja = parseFloat(data.jamKerja) || 0;
         let dtAll = parseFloat(data.dtAll) || 0;
         let pdt = parseFloat(data.pdt) || 0;
-        let target = parseFloat(data.target) || 0;
         let hasilFg = parseFloat(data.hasilFg) || 0;
         let reject = parseFloat(data.reject) || 0;
         let speed = parseFloat(data.speed) || 0;
@@ -506,16 +626,28 @@
     }
 
     function simpanOEE() {
+        let tanggal = document.getElementById('tgl').value;
+        let line = document.getElementById('line').value;
+        if (!tanggal || !line) { alert('Isi tanggal dan line terlebih dahulu!'); return; }
+        
         let data = {
-            id: Date.now(), tanggal: document.getElementById('tgl').value, line: document.getElementById('line').value,
-            produk: document.getElementById('produk').value, jamKerja: parseFloat(document.getElementById('jamKerja').value) || 0,
-            target: parseFloat(document.getElementById('target').value) || 0, hasilFg: parseFloat(document.getElementById('hasilFg').value) || 0,
-            reject: parseFloat(document.getElementById('reject').value) || 0, manPower: parseFloat(document.getElementById('manPower').value) || 0,
-            speed: parseFloat(document.getElementById('speed').value) || 0, isiDus: parseFloat(document.getElementById('isiDus').value) || 0,
-            dtAll: parseFloat(document.getElementById('dtAll').value) || 0, pdt: parseFloat(document.getElementById('pdt').value) || 0
+            id: Date.now(), tanggal: tanggal, line: line,
+            produk: document.getElementById('produk').value, 
+            jamKerja: parseFloat(document.getElementById('jamKerja').value) || 0,
+            target: parseFloat(document.getElementById('target').value) || 0, 
+            hasilFg: parseFloat(document.getElementById('hasilFg').value) || 0,
+            reject: parseFloat(document.getElementById('reject').value) || 0, 
+            manPower: parseFloat(document.getElementById('manPower').value) || 0,
+            speed: parseFloat(document.getElementById('speed').value) || 0, 
+            isiDus: parseFloat(document.getElementById('isiDus').value) || 0,
+            dtAll: parseFloat(document.getElementById('dtAll').value) || 0, 
+            pdt: parseFloat(document.getElementById('pdt').value) || 0
         };
         let oeeResult = hitungOEE(data);
-        data.availability = oeeResult.availability; data.performance = oeeResult.performance; data.quality = oeeResult.quality; data.oee = oeeResult.oee;
+        data.availability = oeeResult.availability; 
+        data.performance = oeeResult.performance; 
+        data.quality = oeeResult.quality; 
+        data.oee = oeeResult.oee;
         data.bulan = data.tanggal.substring(0,7);
         
         let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
@@ -523,6 +655,17 @@
         localStorage.setItem('oeeData', JSON.stringify(oeeData));
         alert('Data OEE tersimpan!');
         loadOEEList(); updateDashboard();
+        
+        // Reset form OEE
+        document.getElementById('jamKerja').value = '';
+        document.getElementById('target').value = '';
+        document.getElementById('hasilFg').value = '';
+        document.getElementById('reject').value = '';
+        document.getElementById('manPower').value = '';
+        document.getElementById('speed').value = '';
+        document.getElementById('isiDus').value = '';
+        document.getElementById('dtAll').value = '';
+        document.getElementById('pdt').value = '';
     }
 
     function loadOEEList() {
@@ -531,8 +674,8 @@
         let filterBulan = document.getElementById('filterBulan')?.value || '';
         let filtered = oeeData.filter(d => (!filterLine || d.line.toLowerCase().includes(filterLine)) && (!filterBulan || d.tanggal.startsWith(filterBulan)));
         filtered.sort((a,b) => b.tanggal.localeCompare(a.tanggal));
-        let html = `<tr><thead> hilab<th>Tanggal</th><th>Line</th><th>Produk</th><th>Jam Kerja</th><th>Target</th><th>Hasil FG</th><th>Reject</th><th>OEE</th><th>Aksi</th></tr></thead><tbody>`;
-        filtered.forEach(d => { html += `<tr><td>${d.tanggal}</td><td>${d.line}</td><td>${d.produk}</td><td>${d.jamKerja}</td><td>${d.target}</td><td>${d.hasilFg}</td><td>${d.reject}</td><td style="background:${d.oee>=85?'#d4edda':(d.oee>=70?'#fff3cd':'#f8d7da')};font-weight:bold;">${d.oee}%</td><td><button class="btn-delete" onclick="hapusOEE(${d.id})">Hapus</button></td></tr>`; });
+        let html = ` <thead> <th>Tanggal</th><th>Line</th><th>Produk</th><th>Jam Kerja</th><th>Target</th><th>Hasil FG</th><th>Reject</th><th>OEE</th><th>Aksi</th> </thead><tbody>`;
+        filtered.forEach(d => { html += `<tr><td>${d.tanggal}</td><td>${d.line}</td><td>${d.produk}</td><td>${d.jamKerja}</td><td>${d.target}</td><td>${d.hasilFg}</td><td>${d.reject}</td><td style="background:${d.oee>=85?'#d4edda':(d.oee>=70?'#fff3cd':'#f8d7da')};font-weight:bold;">${d.oee}%</td><td><button class="btn-delete" onclick="hapusOEE(${d.id})">Hapus</button></td>`; });
         html += `</tbody></table>`;
         document.getElementById('oeeList').innerHTML = html || '<p>Tidak ada data</p>';
     }
@@ -544,31 +687,63 @@
         let start = document.getElementById('listrikStart').value;
         let end = document.getElementById('listrikEnd').value;
         if (!start || !end) { alert('Isi periode start dan end!'); return; }
+        
+        let hitung = hitungTotalListrik();
+        if (hitung.grandTotal === 0) { alert('Isi data listrik terlebih dahulu!'); return; }
+        
         let data = {
-            id: Date.now(), periodeStart: start, periodeEnd: end,
-            mixing: parseFloat(document.getElementById('kwhMixing').value) || 0,
-            transfer: parseFloat(document.getElementById('kwhTransfer').value) || 0,
-            filling1: parseFloat(document.getElementById('kwhFilling1').value) || 0,
-            filling2: parseFloat(document.getElementById('kwhFilling2').value) || 0,
-            compressor: parseFloat(document.getElementById('kwhComp').value) || 0,
-            hvac: parseFloat(document.getElementById('kwhHvac').value) || 0
+            id: Date.now(), 
+            periodeStart: start, 
+            periodeEnd: end,
+            mixingReborn: parseFloat(document.getElementById('mixingReborn').value) || 0,
+            jumlahBlend: parseFloat(document.getElementById('jumlahBlend').value) || 0,
+            screwTransfer: parseFloat(document.getElementById('screwTransfer').value) || 0,
+            fillingLine1Rate: parseFloat(document.getElementById('fillingLine1Rate').value) || 0,
+            lamaAktifLine1: parseFloat(document.getElementById('lamaAktifLine1').value) || 0,
+            fillingLine2Rate: parseFloat(document.getElementById('fillingLine2Rate').value) || 0,
+            lamaAktifLine2: parseFloat(document.getElementById('lamaAktifLine2').value) || 0,
+            hvacRate: parseFloat(document.getElementById('hvacRate').value) || 0,
+            lamaAktifHvac: parseFloat(document.getElementById('lamaAktifHvac').value) || 0,
+            kompresorRate: parseFloat(document.getElementById('kompresorRate').value) || 0,
+            lamaAktifKompresor: parseFloat(document.getElementById('lamaAktifKompresor').value) || 0,
+            totalKwhMixing: hitung.totalMixing,
+            totalKwhTransfer: hitung.totalTransfer,
+            totalKwhLine1: hitung.totalLine1,
+            totalKwhLine2: hitung.totalLine2,
+            totalKwhHvac: hitung.totalHvac,
+            totalKwhKompresor: hitung.totalKompresor,
+            totalMesinProduksi: hitung.totalMesin,
+            totalUtility: hitung.totalUtility,
+            totalKwh: hitung.grandTotal
         };
-        data.totalMesinProduksi = data.mixing + data.transfer + data.filling1 + data.filling2;
-        data.totalUtility = data.compressor + data.hvac;
-        data.totalKwh = data.totalMesinProduksi + data.totalUtility;
         
         let listrikData = JSON.parse(localStorage.getItem('listrikData') || '[]');
         listrikData.push(data);
         localStorage.setItem('listrikData', JSON.stringify(listrikData));
         alert('Data listrik tersimpan!');
         loadListrikList(); updateDashboard();
+        
+        // Reset form listrik
+        document.getElementById('mixingReborn').value = '';
+        document.getElementById('jumlahBlend').value = '';
+        document.getElementById('screwTransfer').value = '';
+        document.getElementById('jumlahBlendTransfer').value = '';
+        document.getElementById('fillingLine1Rate').value = '';
+        document.getElementById('lamaAktifLine1').value = '';
+        document.getElementById('fillingLine2Rate').value = '';
+        document.getElementById('lamaAktifLine2').value = '';
+        document.getElementById('hvacRate').value = '';
+        document.getElementById('lamaAktifHvac').value = '';
+        document.getElementById('kompresorRate').value = '';
+        document.getElementById('lamaAktifKompresor').value = '';
+        hitungTotalListrik();
     }
 
     function loadListrikList() {
         let data = JSON.parse(localStorage.getItem('listrikData') || '[]');
         data.sort((a,b) => b.periodeStart.localeCompare(a.periodeStart));
-        let html = `<table><thead><tr><th>Periode Start</th><th>Periode End</th><th>Mixing</th><th>Transfer</th><th>Filling L1</th><th>Filling L2</th><th>Compressor</th><th>HVAC</th><th>Total kWh</th><th>Aksi</th></tr></thead><tbody>`;
-        data.forEach(d => { html += `<tr><td>${d.periodeStart}</td><td>${d.periodeEnd}</td><td>${d.mixing.toLocaleString()}</td><td>${d.transfer.toLocaleString()}</td><td>${d.filling1.toLocaleString()}</td><td>${d.filling2.toLocaleString()}</td><td>${d.compressor.toLocaleString()}</td><td>${d.hvac.toLocaleString()}</td><td><strong>${d.totalKwh.toLocaleString()}</strong></td><td><button class="btn-delete" onclick="hapusListrik(${d.id})">Hapus</button></td>`; });
+        let html = ` <thead> <th>Periode Start</th><th>Periode End</th><th>Total Mixing</th><th>Total Transfer</th><th>Total Line1</th><th>Total Line2</th><th>Total HVAC</th><th>Total Kompresor</th><th>Total kWh</th><th>Aksi</th> </thead><tbody>`;
+        data.forEach(d => { html += `<tr><td>${d.periodeStart}</td><td>${d.periodeEnd}</td><td>${(d.totalKwhMixing || 0).toLocaleString()}</td><td>${(d.totalKwhTransfer || 0).toLocaleString()}</td><td>${(d.totalKwhLine1 || 0).toLocaleString()}</td><td>${(d.totalKwhLine2 || 0).toLocaleString()}</td><td>${(d.totalKwhHvac || 0).toLocaleString()}</td><td>${(d.totalKwhKompresor || 0).toLocaleString()}</td><td><strong>${d.totalKwh.toLocaleString()}</strong></td><td><button class="btn-delete" onclick="hapusListrik(${d.id})">Hapus</button></td>`; });
         html += `</tbody></table>`;
         document.getElementById('listrikList').innerHTML = html || '<p>Tidak ada data</p>';
     }
@@ -579,18 +754,23 @@
         let start = document.getElementById('pamStart').value;
         let end = document.getElementById('pamEnd').value;
         if (!start || !end) { alert('Isi periode start dan end!'); return; }
-        let data = { id: Date.now(), periodeStart: start, periodeEnd: end, volume: parseFloat(document.getElementById('volPam').value) || 0 };
+        let volume = parseFloat(document.getElementById('volPam').value) || 0;
+        if (volume === 0) { alert('Isi volume pemakaian air!'); return; }
+        
+        let data = { id: Date.now(), periodeStart: start, periodeEnd: end, volume: volume };
         let pamData = JSON.parse(localStorage.getItem('pamData') || '[]');
         pamData.push(data);
         localStorage.setItem('pamData', JSON.stringify(pamData));
         alert('Data PAM tersimpan!');
         loadPamList(); updateDashboard();
+        
+        document.getElementById('volPam').value = '';
     }
 
     function loadPamList() {
         let data = JSON.parse(localStorage.getItem('pamData') || '[]');
         data.sort((a,b) => b.periodeStart.localeCompare(a.periodeStart));
-        let html = `</table><thead><tr><th>Periode Start</th><th>Periode End</th><th>Volume (m³)</th><th>Aksi</th></tr></thead><tbody>`;
+        let html = ` <thead> <th>Periode Start</th><th>Periode End</th><th>Volume (m³)</th><th>Aksi</th> </thead><tbody>`;
         data.forEach(d => { html += `<tr><td>${d.periodeStart}</td><td>${d.periodeEnd}</td><td>${d.volume.toLocaleString()}</td><td><button class="btn-delete" onclick="hapusPam(${d.id})">Hapus</button></td>`; });
         html += `</tbody></table>`;
         document.getElementById('pamList').innerHTML = html || '<p>Tidak ada data</p>';
@@ -613,12 +793,12 @@
             <div class="stat-card warning"><h3>Total Reject</h3><div class="value">${totalReject.toLocaleString()}</div></div>
             <div class="stat-card"><h3>Hari Produksi</h3><div class="value">${oeeData.length}</div></div>`;
         
-        let trendHtml = `<table><thead><tr><th>Tanggal</th><th>Line</th><th>OEE</th><th>Availability</th><th>Performance</th><th>Quality</th></tr></thead><tbody>`;
+        let trendHtml = ` <thead> <th>Tanggal</th><th>Line</th><th>OEE</th><th>Availability</th><th>Performance</th><th>Quality</th> </thead><tbody>`;
         [...oeeData].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).slice(0,10).forEach(d=>{ trendHtml+=`<tr><td>${d.tanggal}</td><td>${d.line}</td><td style="color:${d.oee>=85?'green':(d.oee>=70?'orange':'red')};font-weight:bold;">${d.oee}%</td><td>${d.availability}%</td><td>${d.performance}%</td><td>${d.quality}%</td>`; });
-        trendHtml+=`</tbody></table>`;
+        trendHtml+=`</tbody><table>`;
         document.getElementById('oeeChart').innerHTML = trendHtml;
         
-        let listrikHtml = `<table><thead><tr><th>Periode</th><th>Total kWh</th><th>Total Produksi (pcs)</th><th>kWh/1000pcs</th><th>Estimasi Biaya</th></tr></thead><tbody>`;
+        let listrikHtml = ` <thead> <th>Periode</th><th>Total kWh</th><th>Total Produksi (pcs)</th><th>kWh/1000pcs</th><th>Estimasi Biaya</th> </thead><tbody>`;
         listrikData.forEach(l=>{
             let oeeInRange = oeeData.filter(o=>o.tanggal>=l.periodeStart && o.tanggal<=l.periodeEnd);
             let totalPcs = oeeInRange.reduce((s,o)=>s+(o.hasilFg*o.isiDus),0);
@@ -629,7 +809,7 @@
         listrikHtml+=`</tbody></table>`;
         document.getElementById('listrikVsProduksi').innerHTML = listrikHtml || '<p>Belum ada data listrik</p>';
         
-        let pamHtml = `<table><thead><tr><th>Periode</th><th>Volume (m³)</th><th>Estimasi Biaya</th></tr></thead><tbody>`;
+        let pamHtml = ` <thead> <th>Periode</th><th>Volume (m³)</th><th>Estimasi Biaya</th> </thead><tbody>`;
         pamData.forEach(p=>{
             let estimasi = p.volume * (master.hargaPerM3 || 5000);
             pamHtml+=`<tr><td>${p.periodeStart} s/d ${p.periodeEnd}</td><td>${p.volume.toLocaleString()}</td><td>Rp ${estimasi.toLocaleString()}</td>`;
@@ -637,18 +817,17 @@
         pamHtml+=`</tbody></table>`;
         document.getElementById('pamChart').innerHTML = pamHtml || '<p>Belum ada data PAM</p>';
         
-        // Ringkasan Bulanan
         let bulanUnik = [...new Set(oeeData.map(o=>o.bulan))];
-        let ringkasanHtml = `<table><thead><tr><th>Bulan</th><th>Total Produksi (pcs)</th><th>Rata OEE</th><th>Total kWh</th><th>Total Air (m³)</th></tr></thead><tbody>`;
+        let ringkasanHtml = ` <thead> <th>Bulan</th><th>Total Produksi (pcs)</th><th>Rata OEE</th><th>Total kWh</th><th>Total Air (m³)</th> </thead><tbody>`;
         bulanUnik.forEach(bulan=>{
             let oeeBulan = oeeData.filter(o=>o.bulan===bulan);
             let listrikBulan = listrikData.find(l=>l.periodeStart<=bulan+'-01' && l.periodeEnd>=bulan+'-01');
             let pamBulan = pamData.find(p=>p.periodeStart<=bulan+'-01' && p.periodeEnd>=bulan+'-01');
             let totalPcs = oeeBulan.reduce((s,o)=>s+(o.hasilFg*o.isiDus),0);
             let avgOeeBulan = (oeeBulan.reduce((s,o)=>s+parseFloat(o.oee),0)/oeeBulan.length).toFixed(2);
-            ringkasanHtml+=`<tr><td>${bulan}</td><td>${totalPcs.toLocaleString()}</td><td>${avgOeeBulan}%</td><td>${listrikBulan ? listrikBulan.totalKwh.toLocaleString() : '-'}</td><td>${pamBulan ? pamBulan.volume.toLocaleString() : '-'}</td></tr>`;
+            ringkasanHtml+=`<tr><td>${bulan}</td><td>${totalPcs.toLocaleString()}</td><td>${avgOeeBulan}%</td><td>${listrikBulan ? listrikBulan.totalKwh.toLocaleString() : '-'}</td><td>${pamBulan ? pamBulan.volume.toLocaleString() : '-'}</td>`;
         });
-        ringkasanHtml+=`</tbody></table>`;
+        ringkasanHtml+=`</tbody></tr>`;
         document.getElementById('ringkasanBulanan').innerHTML = ringkasanHtml || '<p>Belum ada data</p>';
     }
 
@@ -672,7 +851,7 @@
         event.target.classList.add('active');
         
         if(panel==='oee') loadOEEList();
-        if(panel==='listrik') loadListrikList();
+        if(panel==='listrik') { loadListrikList(); hitungTotalListrik(); }
         if(panel==='pam') loadPamList();
     }
 
