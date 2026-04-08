@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OEE System - Overall Equipment Effectiveness</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* Tables */
+        .data-table {
+            background: white;
+            border-radius: 10px;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Forms */
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.success {
+            background: #27ae60;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-btn {
+            background: none;
+            padding: 5px 10px;
+            margin: 0 2px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            th, td {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🏭 OEE System - Overall Equipment Effectiveness</h1>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="showTab('input')">📝 Input OEE</button>
+            <button class="tab-btn" onclick="showTab('mesin')">⚙️ Kelola Mesin</button>
+            <button class="tab-btn" onclick="showTab('audit')">📜 Audit Trail</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="data-table">
+            <h3 style="padding: 15px; background: #f8f9fa;">📋 Data OEE Terbaru</h3>
+            <div style="overflow-x: auto;">
+                <table id="oeeTable">
+                    <thead>
+                        <tr><th>Tanggal</th><th>Line</th><th>Produk</th><th>Target</th><th>Hasil FG</th><th>Reject</th><th>OEE</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Form Tab -->
+    <div id="input" class="tab-content">
+        <div class="form-card">
+            <h3>📝 Form Input OEE</h3>
+            <form id="oeeForm">
+                <div class="form-row">
+                    <div class="form-group"><label>Tanggal *</label><input type="date" id="tanggal" required></div>
+                    <div class="form-group"><label>Line *</label><select id="line_id" required></select></div>
+                    <div class="form-group"><label>Jam Kerja *</label><input type="number" id="jam_kerja" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Produk Variant</label><input type="text" id="produk_variant" value="Kaldu Sapi"></div>
+                    <div class="form-group"><label>Pack Vol</label><input type="text" id="pack_vol" value="8gr"></div>
+                    <div class="form-group"><label>Target *</label><input type="number" id="target" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Hasil FG *</label><input type="number" id="hasil_fg" required></div>
+                    <div class="form-group"><label>Reject *</label><input type="number" id="reject" required></div>
+                    <div class="form-group"><label>Man Power</label><input type="number" id="man_power"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Speed / LHP</label><input type="number" id="speed_lhp"></div>
+                    <div class="form-group"><label>Isi 1 Dus (Pcs) *</label><input type="number" id="isi_1_dus_pcs" required></div>
+                    <div class="form-group"><label>DT All</label><input type="number" id="dt_all" value="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>PDT</label><input type="number" id="pdt" value="0"></div>
+                    <div class="form-group"><label>Speed Avg</label><input type="number" id="speed_avg" value="50"></div>
+                    <div class="form-group"><label>Jam Kerja/Line</label><input type="number" id="jam_kerja_per_line" value="600"></div>
+                </div>
+                <button type="button" onclick="hitungDanSimpan()">💾 Hitung & Simpan</button>
+                <button type="reset">Reset</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Kelola Mesin Tab -->
+    <div id="mesin" class="tab-content">
+        <div class="form-card">
+            <h3>➕ Tambah Line/Mesin Baru</h3>
+            <div class="form-row">
+                <div class="form-group"><label>Nama Line</label><input type="text" id="nama_line_baru" placeholder="Contoh: Line 4"></div>
+                <button onclick="tambahLine()" style="margin-top: 30px;">Tambah Line</button>
+            </div>
+        </div>
+        <div class="data-table">
+            <h3 style="padding: 15px;">⚙️ Daftar Line/Mesin</h3>
+            <table id="mesinTable">
+                <thead><tr><th>ID</th><th>Nama Line</th><th>Status</th><th>Aksi</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Audit Trail Tab -->
+    <div id="audit" class="tab-content">
+        <div class="data-table">
+            <h3 style="padding: 15px;">📜 Riwayat Audit Trail</h3>
+            <table id="auditTable">
+                <thead><tr><th>Waktu</th><th>User</th><th>Aksi</th><th>Tabel</th><th>Detail</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Data storage menggunakan localStorage
+    let dataOEE = [];
+    let dataLine = [];
+    let auditTrail = [];
+
+    // Load data awal
+    function loadData() {
+        if(localStorage.getItem('oee_data')) dataOEE = JSON.parse(localStorage.getItem('oee_data'));
+        else {
+            dataOEE = [{
+                id: 1, tanggal: '2025-12-27', line_id: 1, jam_kerja: 900, produk_variant: 'Kaldu Sapi',
+                pack_vol: '8gr', target: 480, hasil_fg: 389, reject: 4347, man_power: 31,
+                speed_lhp: 50, isi_1_dus_pcs: 480, dt_all: 362, pdt: 273, speed_avg: 50,
+                jam_kerja_per_line: 600, total_fg_pcs: 186720, total_fg_ton: 1.5087,
+                hasil_fg_line: 389, isi_1_dus_avg: 480, reject_per_line: 4347,
+                achievement: 81.04, availability: 89.94, performance: 103.73, quality: 97.72, oee: 91.18
+            }];
+        }
+
+        if(localStorage.getItem('line_data')) dataLine = JSON.parse(localStorage.getItem('line_data'));
+        else {
+            dataLine = [
+                {id: 1, nama: 'Line 1', aktif: true},
+                {id: 2, nama: 'Line 2', aktif: true},
+                {id: 3, nama: 'Line 3', aktif: true}
+            ];
+        }
+
+        if(localStorage.getItem('audit_data')) auditTrail = JSON.parse(localStorage.getItem('audit_data'));
+        else {
+            auditTrail = [{
+                id: 1, waktu: new Date().toISOString(), user: 'admin', aksi: 'INSERT',
+                tabel: 'data_oee', detail: 'Data awal OEE Line 2'
+            }];
+        }
+
+        simpanKeLocalStorage();
+        renderAll();
+    }
+
+    function simpanKeLocalStorage() {
+        localStorage.setItem('oee_data', JSON.stringify(dataOEE));
+        localStorage.setItem('line_data', JSON.stringify(dataLine));
+        localStorage.setItem('audit_data', JSON.stringify(auditTrail));
+    }
+
+    function addAudit(user, aksi, tabel, detail) {
+        const newAudit = {
+            id: auditTrail.length + 1,
+            waktu: new Date().toISOString(),
+            user: user || 'system',
+            aksi: aksi,
+            tabel: tabel,
+            detail: detail
+        };
+        auditTrail.unshift(newAudit);
+        if(auditTrail.length > 100) auditTrail.pop();
+        simpanKeLocalStorage();
+    }
+
+    function getLineName(lineId) {
+        const line = dataLine.find(l => l.id == lineId);
+        return line ? line.nama : 'Unknown';
+    }
+
+    function hitungOEE(data) {
+        let totalFGPcs = data.hasil_fg * data.isi_1_dus_pcs;
+        let totalFGTon = totalFGPcs / 125000; // asumsi 8gr * 125000 = 1 ton
+        let achievement = (data.hasil_fg / data.target) * 100;
+        let availability = ((data.jam_kerja - data.dt_all) / data.jam_kerja) * 100;
+        let speedTarget = 50; // asumsi speed target 50
+        let performance = (totalFGPcs / (data.jam_kerja * speedTarget)) * 100;
+        let quality = ((totalFGPcs - data.reject) / totalFGPcs) * 100;
+        let oee = (availability * performance * quality) / 10000;
+
+        return {
+            total_fg_pcs: totalFGPcs,
+            total_fg_ton: parseFloat(totalFGTon.toFixed(4)),
+            achievement: parseFloat(achievement.toFixed(2)),
+            availability: parseFloat(availability.toFixed(2)),
+            performance: parseFloat(performance.toFixed(2)),
+            quality: parseFloat(quality.toFixed(2)),
+            oee: parseFloat(oee.toFixed(2))
+        };
+    }
+
+    function hitungDanSimpan() {
+        const lineId = parseInt(document.getElementById('line_id').value);
+        const newData = {
+            id: dataOEE.length + 1,
+            tanggal: document.getElementById('tanggal').value,
+            line_id: lineId,
+            jam_kerja: parseInt(document.getElementById('jam_kerja').value),
+            produk_variant: document.getElementById('produk_variant').value,
+            pack_vol: document.getElementById('pack_vol').value,
+            target: parseInt(document.getElementById('target').value),
+            hasil_fg: parseInt(document.getElementById('hasil_fg').value),
+            reject: parseInt(document.getElementById('reject').value),
+            man_power: parseInt(document.getElementById('man_power').value) || 0,
+            speed_lhp: parseInt(document.getElementById('speed_lhp').value) || 0,
+            isi_1_dus_pcs: parseInt(document.getElementById('isi_1_dus_pcs').value),
+            dt_all: parseInt(document.getElementById('dt_all').value) || 0,
+            pdt: parseInt(document.getElementById('pdt').value) || 0,
+            speed_avg: parseInt(document.getElementById('speed_avg').value) || 0,
+            jam_kerja_per_line: parseInt(document.getElementById('jam_kerja_per_line').value) || 0
+        };
+
+        const hasil = hitungOEE(newData);
+        const finalData = {...newData, ...hasil, hasil_fg_line: newData.hasil_fg, isi_1_dus_avg: newData.isi_1_dus_pcs, reject_per_line: newData.reject};
+
+        dataOEE.push(finalData);
+        addAudit('admin', 'INSERT', 'data_oee', `Menambah data OEE untuk ${getLineName(lineId)} tgl ${finalData.tanggal}`);
+        simpanKeLocalStorage();
+        alert('Data berhasil disimpan! OEE: ' + finalData.oee + '%');
+        document.getElementById('oeeForm').reset();
+        renderAll();
+        showTab('dashboard');
+    }
+
+    function hapusDataOEE(id) {
+        if(confirm('Yakin hapus data ini?')) {
+            const deleted = dataOEE.find(d => d.id == id);
+            dataOEE = dataOEE.filter(d => d.id != id);
+            addAudit('admin', 'DELETE', 'data_oee', `Menghapus data OEE untuk ${getLineName(deleted.line_id)} tgl ${deleted.tanggal}`);
+            simpanKeLocalStorage();
+            renderAll();
+        }
+    }
+
+    function tambahLine() {
+        const nama = document.getElementById('nama_line_baru').value.trim();
+        if(!nama) return alert('Nama line harus diisi');
+        const newId = dataLine.length + 1;
+        dataLine.push({id: newId, nama: nama, aktif: true});
+        addAudit('admin', 'INSERT', 'mesin_line', `Menambah line baru: ${nama}`);
+        simpanKeLocalStorage();
+        document.getElementById('nama_line_baru').value = '';
+        renderAll();
+    }
+
+    function toggleLineStatus(id) {
+        const line = dataLine.find(l => l.id == id);
+        if(line) {
+            line.aktif = !line.aktif;
+            addAudit('admin', 'UPDATE', 'mesin_line', `${line.nama} status menjadi ${line.aktif ? 'Aktif' : 'Nonaktif'}`);
+            simpanKeLocalStorage();
+            renderAll();
+        }
+    }
+
+    function renderDashboard() {
+        if(dataOEE.length === 0) {
+            document.getElementById('statsGrid').innerHTML = '<div class="stat-card"><h3>Tidak ada data</h3></div>';
+            return;
+        }
+
+        const avgOEE = dataOEE.reduce((sum, d) => sum + d.oee, 0) / dataOEE.length;
+        const avgAvail = dataOEE.reduce((sum, d) => sum + d.availability, 0) / dataOEE.length;
+        const avgPerf = dataOEE.reduce((sum, d) => sum + d.performance, 0) / dataOEE.length;
+        const avgQual = dataOEE.reduce((sum, d) => sum + d.quality, 0) / dataOEE.length;
+        const totalReject = dataOEE.reduce((sum, d) => sum + d.reject, 0);
+
+        document.getElementById('statsGrid').innerHTML = `
+            <div class="stat-card"><h3>Rata-rata OEE</h3><div class="value">${avgOEE.toFixed(2)}%</div></div>
+            <div class="stat-card"><h3>Availability</h3><div class="value">${avgAvail.toFixed(2)}%</div></div>
+            <div class="stat-card"><h3>Performance</h3><div class="value">${avgPerf.toFixed(2)}%</div></div>
+            <div class="stat-card"><h3>Quality</h3><div class="value">${avgQual.toFixed(2)}%</div></div>
+            <div class="stat-card"><h3>Total Reject</h3><div class="value">${totalReject.toLocaleString()}</div></div>
+        `;
+    }
+
+    function renderOEETable() {
+        const tbody = document.querySelector('#oeeTable tbody');
+        tbody.innerHTML = '';
+        dataOEE.slice().reverse().forEach(d => {
+            let oeeClass = d.oee >= 85 ? 'badge-high' : (d.oee >= 60 ? 'badge-medium' : 'badge-low');
+            tbody.innerHTML += `
+                <tr>
+                    <td>${d.tanggal}</td><td>${getLineName(d.line_id)}</td><td>${d.produk_variant}</td>
+                    <td>${d.target}</td><td>${d.hasil_fg}</td><td>${d.reject}</td>
+                    <td><span class="badge ${oeeClass}">${d.oee}%</span></td>
+                    <td><button class="action-btn" onclick="hapusDataOEE(${d.id})">🗑️</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderLineSelect() {
+        const select = document.getElementById('line_id');
+        select.innerHTML = '';
+        dataLine.filter(l => l.aktif).forEach(line => {
+            select.innerHTML += `<option value="${line.id}">${line.nama}</option>`;
+        });
+    }
+
+    function renderMesinTable() {
+        const tbody = document.querySelector('#mesinTable tbody');
+        tbody.innerHTML = '';
+        dataLine.forEach(line => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${line.id}</td><td>${line.nama}</td>
+                    <td><span class="badge ${line.aktif ? 'badge-high' : 'badge-low'}">${line.aktif ? 'Aktif' : 'Nonaktif'}</span></td>
+                    <td><button onclick="toggleLineStatus(${line.id})">${line.aktif ? 'Nonaktifkan' : 'Aktifkan'}</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderAuditTable() {
+        const tbody = document.querySelector('#auditTable tbody');
+        tbody.innerHTML = '';
+        auditTrail.slice(0, 50).forEach(audit => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${new Date(audit.waktu).toLocaleString()}</td>
+                    <td>${audit.user}</td><td>${audit.aksi}</td><td>${audit.tabel}</td>
+                    <td>${audit.detail}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderAll() {
+        renderDashboard();
+        renderOEETable();
+        renderLineSelect();
+        renderMesinTable();
+        renderAuditTable();
+    }
+
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderAll();
+    }
+
+    // Inisialisasi
+    loadData();
+</script>
+</body>
+</html>
