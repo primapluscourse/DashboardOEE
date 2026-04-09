@@ -151,7 +151,6 @@
             background: #6c757d;
         }
 
-        /* Score card layout - full width, no wasted space */
         .scorecard-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -318,35 +317,74 @@
             margin-top: 20px;
         }
 
-        .data-table {
+        /* Tabel Rapi */
+        .table-wrapper {
             width: 100%;
             overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
         }
 
-        table {
+        .data-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 13px;
         }
 
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
+        .data-table th {
             background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
             font-weight: 600;
             color: #1e5c3c;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .data-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
         }
 
         .btn-delete {
             background: #dc3545;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
+            padding: 5px 12px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .badge-oee {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .badge-oee.high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-oee.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-oee.low {
+            background: #f8d7da;
+            color: #721c24;
         }
 
         .input-subnav {
@@ -409,6 +447,13 @@
             font-size: 10px;
             color: #adb5bd;
             margin-top: 8px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -547,118 +592,49 @@
     <div id="modalListrik" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>⚡ Dashboard Pemakaian Listrik - PT ALAM MUSTIKA HIJAU</h2>
+                <h2>⚡ Dashboard Pemakaian Listrik</h2>
                 <button class="close-modal" onclick="closeModal('modalListrik')">&times;</button>
             </div>
             <div>
                 <div class="filter-bar-dashboard" style="margin-bottom: 20px;">
-                    <div class="filter-group">
-                        <label>📅 Tanggal Start</label>
-                        <input type="date" id="listrikFilterStart" onchange="updateListrikCharts()">
-                    </div>
-                    <div class="filter-group">
-                        <label>📅 Tanggal End</label>
-                        <input type="date" id="listrikFilterEnd" onchange="updateListrikCharts()">
-                    </div>
-                    <button class="btn-filter reset" onclick="resetListrikFilter()">🔄 Reset ke Bulan Ini</button>
+                    <div class="filter-group"><label>Start</label><input type="date" id="listrikFilterStart" onchange="updateListrikCharts()"></div>
+                    <div class="filter-group"><label>End</label><input type="date" id="listrikFilterEnd" onchange="updateListrikCharts()"></div>
+                    <button class="btn-filter reset" onclick="resetListrikFilter()">Reset</button>
                 </div>
-
                 <div class="scorecard-container" style="margin-bottom: 24px;">
-                    <div class="score-card">
-                        <div class="score-icon">⚡</div>
-                        <div class="value" id="listrikTotalKwh">0 kWh</div>
-                        <div class="label">Total Pemakaian Listrik</div>
-                    </div>
-                    <div class="score-card">
-                        <div class="score-icon">💰</div>
-                        <div class="value" id="listrikTotalBiaya">Rp 0</div>
-                        <div class="label">Total Biaya Listrik</div>
-                    </div>
-                    <div class="score-card">
-                        <div class="score-icon">🏷️</div>
-                        <div class="value" id="listrikHargaKwh">Rp 0 /kWh</div>
-                        <div class="label">Harga Listrik Saat Ini</div>
-                        <div style="font-size: 11px; color: #6c757d; margin-top: 6px;" id="listrikLastUpdate">Last Update: -</div>
-                    </div>
+                    <div class="score-card"><div class="score-icon">⚡</div><div class="value" id="listrikTotalKwh">0 kWh</div><div class="label">Total Pemakaian</div></div>
+                    <div class="score-card"><div class="score-icon">💰</div><div class="value" id="listrikTotalBiaya">Rp 0</div><div class="label">Total Biaya</div></div>
+                    <div class="score-card"><div class="score-icon">🏷️</div><div class="value" id="listrikHargaKwh">Rp 0 /kWh</div><div class="label">Harga Listrik</div><div style="font-size:11px" id="listrikLastUpdate"></div></div>
                 </div>
-
-                <div class="card">
-                    <div class="card-title">📈 Trend Pemakaian Listrik per Bulan (Tahun Berjalan)</div>
-                    <div class="chart-container">
-                        <canvas id="listrikMonthlyTrendChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">📊 Perbandingan Mesin Produksi vs Utility</div>
-                    <div class="chart-container">
-                        <canvas id="listrikBarChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-
+                <div class="card"><div class="card-title">📈 Trend Listrik per Bulan</div><canvas id="listrikMonthlyTrendChart"></canvas></div>
+                <div class="card"><div class="card-title">📊 Mesin vs Utility</div><canvas id="listrikBarChart"></canvas></div>
                 <div class="chart-row">
-                    <div class="card">
-                        <div class="card-title">🔧 Trend Pemakaian Listrik Mesin Produksi</div>
-                        <div class="chart-container">
-                            <canvas id="listrikMesinTrendChart" style="max-height: 280px;"></canvas>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">⚙️ Trend Pemakaian Listrik Utility</div>
-                        <div class="chart-container">
-                            <canvas id="listrikUtilityTrendChart" style="max-height: 280px;"></canvas>
-                        </div>
-                    </div>
+                    <div class="card"><div class="card-title">🔧 Trend Mesin Produksi</div><canvas id="listrikMesinTrendChart"></canvas></div>
+                    <div class="card"><div class="card-title">⚙️ Trend Utility</div><canvas id="listrikUtilityTrendChart"></canvas></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ==================== MODAL DASHBOARD PAM ==================== -->
+    <!-- MODAL PAM -->
     <div id="modalPam" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>💧 Dashboard Pemakaian PAM - PT ALAM MUSTIKA HIJAU</h2>
+                <h2>💧 Dashboard Pemakaian PAM</h2>
                 <button class="close-modal" onclick="closeModal('modalPam')">&times;</button>
             </div>
             <div>
                 <div class="filter-bar-dashboard" style="margin-bottom: 20px;">
-                    <div class="filter-group">
-                        <label>📅 Tanggal Start</label>
-                        <input type="date" id="pamFilterStart" onchange="updatePamCharts()">
-                    </div>
-                    <div class="filter-group">
-                        <label>📅 Tanggal End</label>
-                        <input type="date" id="pamFilterEnd" onchange="updatePamCharts()">
-                    </div>
-                    <button class="btn-filter reset" onclick="resetPamFilter()">🔄 Reset ke Bulan Ini</button>
+                    <div class="filter-group"><label>Start</label><input type="date" id="pamFilterStart" onchange="updatePamCharts()"></div>
+                    <div class="filter-group"><label>End</label><input type="date" id="pamFilterEnd" onchange="updatePamCharts()"></div>
+                    <button class="btn-filter reset" onclick="resetPamFilter()">Reset</button>
                 </div>
-
                 <div class="scorecard-container" style="margin-bottom: 24px;">
-                    <div class="score-card">
-                        <div class="score-icon">💧</div>
-                        <div class="value" id="pamTotalVolume">0 m³</div>
-                        <div class="label">Total Pemakaian Air</div>
-                    </div>
-                    <div class="score-card">
-                        <div class="score-icon">💰</div>
-                        <div class="value" id="pamTotalBiaya">Rp 0</div>
-                        <div class="label">Total Biaya Air</div>
-                    </div>
-                    <div class="score-card">
-                        <div class="score-icon">🏷️</div>
-                        <div class="value" id="pamHargaM3">Rp 0 /m³</div>
-                        <div class="label">Harga Air Saat Ini</div>
-                        <div style="font-size: 11px; color: #6c757d; margin-top: 6px;" id="pamLastUpdate">Last Update: -</div>
-                    </div>
+                    <div class="score-card"><div class="score-icon">💧</div><div class="value" id="pamTotalVolume">0 m³</div><div class="label">Total Pemakaian</div></div>
+                    <div class="score-card"><div class="score-icon">💰</div><div class="value" id="pamTotalBiaya">Rp 0</div><div class="label">Total Biaya</div></div>
+                    <div class="score-card"><div class="score-icon">🏷️</div><div class="value" id="pamHargaM3">Rp 0 /m³</div><div class="label">Harga Air</div><div style="font-size:11px" id="pamLastUpdate"></div></div>
                 </div>
-
-                <div class="card">
-                    <div class="card-title">📈 Trend Pemakaian Air per Bulan (Tahun Berjalan)</div>
-                    <div class="chart-container">
-                        <canvas id="pamMonthlyTrendChart" style="max-height: 350px;"></canvas>
-                    </div>
-                </div>
+                <div class="card"><div class="card-title">📈 Trend Pemakaian Air per Bulan</div><canvas id="pamMonthlyTrendChart"></canvas></div>
             </div>
         </div>
     </div>
@@ -671,802 +647,374 @@
             <button class="input-nav-btn" onclick="switchInputPanel('pam')">💧 PAM</button>
         </div>
 
+        <!-- Panel OEE -->
         <div id="input-oee" class="input-panel active">
             <div class="card">
-                <div class="card-title">📝 Input Data Produksi Harian</div>
+                <div class="card-title">📝 Input Data OEE Harian</div>
                 <div class="form-grid">
                     <div class="form-group"><label>Tanggal</label><input type="date" id="tgl"></div>
-                    <div class="form-group"><label>Line</label><select id="line"><option value="">Pilih Line</option><option value="Line 1">Line 1</option><option value="Line 2">Line 2</option></select></div>
-                    <div class="form-group"><label>Produk</label><select id="produk"><option value="">Pilih Produk</option><option value="Kaldu Sapi">Kaldu Sapi</option><option value="Kaldu Ayam">Kaldu Ayam</option></select></div>
-                    <div class="form-group"><label>Jam Kerja (menit)</label><input type="number" id="jamKerja"></div>
+                    <div class="form-group"><label>Line</label><select id="line"><option>Line 1</option><option>Line 2</option></select></div>
+                    <div class="form-group"><label>Produk</label><select id="produk"><option>Kaldu Sapi</option><option>Kaldu Ayam</option></select></div>
+                    <div class="form-group"><label>Jam Kerja (menit)</label><input type="number" id="jamKerja" placeholder="960"></div>
                     <div class="form-group"><label>Target (dus)</label><input type="number" id="target"></div>
                     <div class="form-group"><label>Hasil FG (dus)</label><input type="number" id="hasilFg"></div>
                     <div class="form-group"><label>Reject (pcs)</label><input type="number" id="reject"></div>
-                    <div class="form-group"><label>Man Power</label><input type="number" id="manPower"></div>
-                    <div class="form-group"><label>Speed (pcs/menit)</label><input type="number" id="speed"></div>
-                    <div class="form-group"><label>Isi 1 Dus (pcs)</label><input type="number" id="isiDus"></div>
-                    <div class="form-group"><label>Downtime All (menit)</label><input type="number" id="dtAll"></div>
-                    <div class="form-group"><label>Planned Downtime</label><input type="number" id="pdt"></div>
+                    <div class="form-group"><label>Speed (pcs/menit)</label><input type="number" id="speed" value="50"></div>
+                    <div class="form-group"><label>Isi 1 Dus (pcs)</label><input type="number" id="isiDus" value="480"></div>
+                    <div class="form-group"><label>Downtime (menit)</label><input type="number" id="dtAll"></div>
+                    <div class="form-group"><label>Planned DT</label><input type="number" id="pdt"></div>
                 </div>
-                <button class="btn-submit" onclick="simpanOEE()">💾 Simpan Data OEE</button>
+                <button class="btn-submit" onclick="simpanOEE()">💾 Simpan OEE</button>
             </div>
             <div class="card">
                 <div class="card-title">📋 Riwayat Data OEE</div>
-                <div class="data-table" id="oeeList"></div>
+                <div class="filter-bar"><input type="text" id="filterOEE" placeholder="Cari Line/Produk" onkeyup="loadOEEList()"></div>
+                <div class="table-wrapper"><table class="data-table" id="oeeTable"><thead><tr><th>Tanggal</th><th>Line</th><th>Produk</th><th>Target</th><th>Hasil</th><th>OEE</th><th>Aksi</th></tr></thead><tbody id="oeeListBody"></tbody></table></div>
             </div>
         </div>
 
+        <!-- Panel Listrik -->
         <div id="input-listrik" class="input-panel">
             <div class="card">
                 <div class="card-title">⚡ Input Pemakaian Listrik</div>
-                <div class="info-hitung">💡 Isi data komponen, sistem akan menghitung total kWh otomatis.</div>
-                <div class="periode-range">
-                    <div class="form-group"><label>Periode Start</label><input type="date" id="listrikStart"></div>
-                    <div class="form-group"><label>Periode End</label><input type="date" id="listrikEnd"></div>
-                </div>
-                <div class="section-title">🔧 MESIN PRODUKSI</div>
+                <div class="periode-range"><div class="form-group"><label>Periode Start</label><input type="date" id="listrikStart"></div><div class="form-group"><label>Periode End</label><input type="date" id="listrikEnd"></div></div>
+                <div class="section-title">Mesin Produksi</div>
                 <div class="form-grid">
                     <div class="form-group"><label>Mixing (kWh)</label><input type="number" id="mixingKwh" step="0.01"></div>
                     <div class="form-group"><label>Transfer (kWh)</label><input type="number" id="transferKwh" step="0.01"></div>
                     <div class="form-group"><label>Filling Line 1 (kWh)</label><input type="number" id="filling1Kwh" step="0.01"></div>
                     <div class="form-group"><label>Filling Line 2 (kWh)</label><input type="number" id="filling2Kwh" step="0.01"></div>
                 </div>
-                <div class="section-title">⚙️ UTILITY</div>
+                <div class="section-title">Utility</div>
                 <div class="form-grid">
                     <div class="form-group"><label>HVAC (kWh)</label><input type="number" id="hvacKwh" step="0.01"></div>
                     <div class="form-group"><label>Kompresor (kWh)</label><input type="number" id="kompresorKwh" step="0.01"></div>
                 </div>
-                <button class="btn-submit" onclick="simpanListrik()">💾 Simpan Data Listrik</button>
+                <button class="btn-submit" onclick="simpanListrik()">💾 Simpan Listrik</button>
             </div>
             <div class="card">
-                <div class="card-title">📋 Riwayat Pemakaian Listrik</div>
-                <div class="data-table" id="listrikList"></div>
+                <div class="card-title">📋 Riwayat Listrik</div>
+                <div class="table-wrapper"><table class="data-table" id="listrikTable"><thead><tr><th>Periode Start</th><th>Periode End</th><th>Total kWh</th><th>Aksi</th></tr></thead><tbody id="listrikListBody"></tbody></table></div>
             </div>
         </div>
 
+        <!-- Panel PAM -->
         <div id="input-pam" class="input-panel">
             <div class="card">
                 <div class="card-title">💧 Input Pemakaian PAM</div>
-                <div class="periode-range">
-                    <div class="form-group"><label>Periode Start</label><input type="date" id="pamStart"></div>
-                    <div class="form-group"><label>Periode End</label><input type="date" id="pamEnd"></div>
-                </div>
+                <div class="periode-range"><div class="form-group"><label>Periode Start</label><input type="date" id="pamStart"></div><div class="form-group"><label>Periode End</label><input type="date" id="pamEnd"></div></div>
                 <div class="form-group"><label>Volume (m³)</label><input type="number" id="volPam" step="0.01"></div>
-                <button class="btn-submit" onclick="simpanPam()">💾 Simpan Data PAM</button>
+                <button class="btn-submit" onclick="simpanPam()">💾 Simpan PAM</button>
             </div>
             <div class="card">
-                <div class="card-title">📋 Riwayat Pemakaian PAM</div>
-                <div class="data-table" id="pamList"></div>
+                <div class="card-title">📋 Riwayat PAM</div>
+                <div class="table-wrapper"><table class="data-table" id="pamTable"><thead><tr><th>Periode Start</th><th>Periode End</th><th>Volume (m³)</th><th>Aksi</th></tr></thead><tbody id="pamListBody"></tbody></table></div>
             </div>
         </div>
     </div>
 
-    <!-- ==================== TAB MANAGEMENT ==================== -->
+    <!-- TAB MANAGEMENT & AUDIT -->
     <div id="tab-management" class="tab-content">
         <div class="card">
             <div class="card-title">💰 Master Data Harga</div>
             <div class="form-grid">
-                <div class="form-group"><label>Harga Listrik per kWh (Rp)</label><input type="number" id="hargaPerKwh" step="1"></div>
-                <div class="form-group"><label>Harga Air per m³ (Rp)</label><input type="number" id="hargaPerM3" step="1"></div>
+                <div class="form-group"><label>Harga Listrik (Rp/kWh)</label><input type="number" id="hargaPerKwh" value="1700"></div>
+                <div class="form-group"><label>Harga Air (Rp/m³)</label><input type="number" id="hargaPerM3" value="5000"></div>
             </div>
-            <button class="btn-submit" onclick="simpanMasterHarga()">💾 Simpan Master Harga</button>
+            <button class="btn-submit" onclick="simpanMasterHarga()">💾 Simpan</button>
         </div>
-        <div class="card">
-            <div class="card-title">📋 Master Data Saat Ini</div>
-            <div id="masterDataInfo"></div>
-        </div>
+        <div class="card"><div class="card-title">📋 Info Master</div><div id="masterDataInfo"></div></div>
     </div>
 
-    <!-- ==================== TAB AUDIT TRAIL ==================== -->
     <div id="tab-audit" class="tab-content">
-        <div class="card">
-            <div class="card-title">📜 Audit Trail Perubahan Harga</div>
-            <div class="data-table" id="auditList"></div>
-        </div>
+        <div class="card"><div class="card-title">📜 Audit Trail</div><div class="table-wrapper"><table class="data-table" id="auditTable"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Nilai Lama</th><th>Nilai Baru</th><th>User</th></tr></thead><tbody id="auditListBody"></tbody></table></div></div>
     </div>
 </div>
 
 <script>
-    // ============ GLOBAL CHARTS ============
-    let oeeMonthlyChart = null;
-    let downtimeDailyChart = null;
-    let listrikMonthlyTrendChart = null;
-    let listrikBarChart = null;
-    let listrikMesinTrendChart = null;
-    let listrikUtilityTrendChart = null;
-    let pamMonthlyTrendChart = null;
-
-    // Plugin untuk label di chart
     Chart.register(ChartDataLabels);
-    Chart.defaults.set('plugins.datalabels', {
-        color: '#1e5c3c',
-        anchor: 'end',
-        align: 'top',
-        offset: 4,
-        font: { weight: 'bold', size: 11 }
-    });
+    Chart.defaults.set('plugins.datalabels', { color: '#1e5c3c', anchor: 'end', align: 'top', offset: 4, font: { weight: 'bold', size: 11 } });
 
-    // ============ DATA DUMMY ============
-    function loadDummyData() {
-        // Cek apakah sudah ada data, jika belum maka buat data dummy
-        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
-        let listrikData = JSON.parse(localStorage.getItem('listrikData') || '[]');
-        let pamData = JSON.parse(localStorage.getItem('pamData') || '[]');
-
-        if (oeeData.length === 0) {
-            const dummyOEE = [];
-            const startDate = new Date(2025, 0, 1);
+    // ============ SEED DATA DUMMY ============
+    function seedDummyData() {
+        if (!localStorage.getItem('oeeData')) {
+            let oee = [];
             for (let i = 0; i < 60; i++) {
-                const date = new Date(2025, 0, 1 + i);
-                const dateStr = date.toISOString().split('T')[0];
-                const oeeVal = 70 + Math.random() * 25;
-                const availVal = 80 + Math.random() * 15;
-                const perfVal = 75 + Math.random() * 20;
-                const qualVal = 90 + Math.random() * 9;
-                dummyOEE.push({
-                    id: i + 1,
-                    tanggal: dateStr,
-                    line: Math.random() > 0.5 ? 'Line 1' : 'Line 2',
-                    produk: Math.random() > 0.5 ? 'Kaldu Sapi' : 'Kaldu Ayam',
-                    jamKerja: 960,
-                    target: 500 + Math.floor(Math.random() * 200),
-                    hasilFg: 450 + Math.floor(Math.random() * 250),
-                    reject: Math.floor(Math.random() * 500),
-                    manPower: 31,
-                    speed: 50,
-                    isiDus: 480,
-                    dtAll: Math.floor(Math.random() * 120),
-                    pdt: Math.floor(Math.random() * 60),
-                    availability: availVal.toFixed(2),
-                    performance: perfVal.toFixed(2),
-                    quality: qualVal.toFixed(2),
-                    oee: oeeVal.toFixed(2),
-                    bulan: dateStr.substring(0, 7)
+                let d = new Date(2025, 0, 1 + i);
+                let tgl = d.toISOString().split('T')[0];
+                let oeeVal = 65 + Math.random() * 30;
+                oee.push({
+                    id: i+1, tanggal: tgl, line: i%2===0?'Line 1':'Line 2', produk: i%3===0?'Kaldu Sapi':'Kaldu Ayam',
+                    jamKerja: 960, target: 500+Math.floor(Math.random()*200), hasilFg: 450+Math.floor(Math.random()*250),
+                    reject: Math.floor(Math.random()*500), speed: 50, isiDus: 480,
+                    dtAll: Math.floor(Math.random()*120), pdt: Math.floor(Math.random()*60),
+                    availability: (75+Math.random()*20).toFixed(2), performance: (70+Math.random()*25).toFixed(2),
+                    quality: (88+Math.random()*11).toFixed(2), oee: oeeVal.toFixed(2), bulan: tgl.substring(0,7)
                 });
             }
-            localStorage.setItem('oeeData', JSON.stringify(dummyOEE));
+            localStorage.setItem('oeeData', JSON.stringify(oee));
         }
-
-        if (listrikData.length === 0) {
-            const dummyListrik = [];
-            for (let i = 1; i <= 12; i++) {
-                const monthStr = `2025-${i.toString().padStart(2, '0')}-01`;
-                const endStr = `2025-${i.toString().padStart(2, '0')}-28`;
-                const totalKwh = 8000 + Math.random() * 7000;
-                dummyListrik.push({
-                    id: i,
-                    periodeStart: monthStr,
-                    periodeEnd: endStr,
-                    totalMesinProduksi: totalKwh * 0.7,
-                    totalUtility: totalKwh * 0.3,
-                    totalKwh: totalKwh
-                });
+        if (!localStorage.getItem('listrikData')) {
+            let listrik = [];
+            for (let i=1;i<=12;i++) {
+                let total = 5000 + Math.random()*8000;
+                listrik.push({ id:i, periodeStart:`2025-${String(i).padStart(2,'0')}-01`, periodeEnd:`2025-${String(i).padStart(2,'0')}-28`, totalMesinProduksi:total*0.7, totalUtility:total*0.3, totalKwh:total });
             }
-            localStorage.setItem('listrikData', JSON.stringify(dummyListrik));
+            localStorage.setItem('listrikData', JSON.stringify(listrik));
         }
-
-        if (pamData.length === 0) {
-            const dummyPam = [];
-            for (let i = 1; i <= 12; i++) {
-                const monthStr = `2025-${i.toString().padStart(2, '0')}-01`;
-                const endStr = `2025-${i.toString().padStart(2, '0')}-28`;
-                dummyPam.push({
-                    id: i,
-                    periodeStart: monthStr,
-                    periodeEnd: endStr,
-                    volume: 200 + Math.random() * 300
-                });
+        if (!localStorage.getItem('pamData')) {
+            let pam = [];
+            for (let i=1;i<=12;i++) {
+                pam.push({ id:i, periodeStart:`2025-${String(i).padStart(2,'0')}-01`, periodeEnd:`2025-${String(i).padStart(2,'0')}-28`, volume:150+Math.random()*350 });
             }
-            localStorage.setItem('pamData', JSON.stringify(dummyPam));
+            localStorage.setItem('pamData', JSON.stringify(pam));
         }
+        if (!localStorage.getItem('masterHarga')) localStorage.setItem('masterHarga', JSON.stringify({ hargaPerKwh:1700, hargaPerM3:5000, lastUpdate:new Date().toISOString() }));
+        if (!localStorage.getItem('auditTrail')) localStorage.setItem('auditTrail', JSON.stringify([]));
     }
 
-    // ============ HELPER ============
+    // ============ FUNGSI DASHBOARD ============
     function getCurrentMonthRange() {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), now.getMonth(), 1);
-        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        let now = new Date();
+        let start = new Date(now.getFullYear(), now.getMonth(), 1);
+        let end = new Date(now.getFullYear(), now.getMonth()+1, 0);
         return { start: start.toISOString().split('T')[0], end: end.toISOString().split('T')[0] };
     }
 
-    function setDefaultFilter() {
-        const range = getCurrentMonthRange();
-        document.getElementById('filterStartDate').value = range.start;
-        document.getElementById('filterEndDate').value = range.end;
-    }
-
-    // ============ DASHBOARD UTAMA ============
     function updateDashboard() {
-        const startDate = document.getElementById('filterStartDate').value;
-        const endDate = document.getElementById('filterEndDate').value;
-        if (!startDate || !endDate) return;
-
-        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
-        let listrikData = JSON.parse(localStorage.getItem('listrikData') || '[]');
-        let pamData = JSON.parse(localStorage.getItem('pamData') || '[]');
-        let master = JSON.parse(localStorage.getItem('masterHarga') || '{"hargaPerKwh":1700,"hargaPerM3":5000}');
-
-        let filteredOEE = oeeData.filter(d => d.tanggal >= startDate && d.tanggal <= endDate);
-        let avgOEE = filteredOEE.length > 0 ? (filteredOEE.reduce((sum, d) => sum + parseFloat(d.oee), 0) / filteredOEE.length).toFixed(2) : 0;
-        document.getElementById('scoreOEE').innerHTML = avgOEE + '%';
-
-        let totalKwh = 0;
-        listrikData.forEach(l => {
-            if (l.periodeStart <= endDate && l.periodeEnd >= startDate) {
-                totalKwh += l.totalKwh || 0;
-            }
-        });
-        let biayaListrik = totalKwh * (master.hargaPerKwh || 1700);
-        document.getElementById('scoreListrikKwh').innerHTML = totalKwh.toLocaleString() + ' kWh';
-        document.getElementById('scoreListrikBiaya').innerHTML = 'Rp ' + biayaListrik.toLocaleString();
-
-        let totalVolume = 0;
-        pamData.forEach(p => {
-            if (p.periodeStart <= endDate && p.periodeEnd >= startDate) {
-                totalVolume += p.volume || 0;
-            }
-        });
-        let biayaPam = totalVolume * (master.hargaPerM3 || 5000);
-        document.getElementById('scorePamVolume').innerHTML = totalVolume.toLocaleString() + ' m³';
-        document.getElementById('scorePamBiaya').innerHTML = 'Rp ' + biayaPam.toLocaleString();
+        let start = document.getElementById('filterStartDate').value;
+        let end = document.getElementById('filterEndDate').value;
+        if (!start || !end) return;
+        let oee = JSON.parse(localStorage.getItem('oeeData')||'[]').filter(d=>d.tanggal>=start && d.tanggal<=end);
+        let avgOee = oee.length ? (oee.reduce((a,b)=>a+parseFloat(b.oee),0)/oee.length).toFixed(2) : 0;
+        document.getElementById('scoreOEE').innerHTML = avgOee+'%';
+        
+        let listrik = JSON.parse(localStorage.getItem('listrikData')||'[]');
+        let totalKwh = listrik.filter(l=>l.periodeStart<=end && l.periodeEnd>=start).reduce((a,b)=>a+(b.totalKwh||0),0);
+        let harga = JSON.parse(localStorage.getItem('masterHarga')||'{}');
+        document.getElementById('scoreListrikKwh').innerHTML = totalKwh.toLocaleString()+' kWh';
+        document.getElementById('scoreListrikBiaya').innerHTML = 'Rp '+(totalKwh*(harga.hargaPerKwh||1700)).toLocaleString();
+        
+        let pam = JSON.parse(localStorage.getItem('pamData')||'[]');
+        let totalVol = pam.filter(p=>p.periodeStart<=end && p.periodeEnd>=start).reduce((a,b)=>a+(b.volume||0),0);
+        document.getElementById('scorePamVolume').innerHTML = totalVol.toLocaleString()+' m³';
+        document.getElementById('scorePamBiaya').innerHTML = 'Rp '+(totalVol*(harga.hargaPerM3||5000)).toLocaleString();
     }
 
     function applyFilter() { updateDashboard(); }
-    function resetFilterToCurrentMonth() { const range = getCurrentMonthRange(); document.getElementById('filterStartDate').value = range.start; document.getElementById('filterEndDate').value = range.end; updateDashboard(); }
+    function resetFilterToCurrentMonth() { let r = getCurrentMonthRange(); document.getElementById('filterStartDate').value = r.start; document.getElementById('filterEndDate').value = r.end; updateDashboard(); }
 
-    // ============ DASHBOARD OEE ============
-    function showDetailOEE() {
-        const modal = document.getElementById('modalOEE');
-        const range = getCurrentMonthRange();
-        document.getElementById('oeeFilterStart').value = range.start;
-        document.getElementById('oeeFilterEnd').value = range.end;
-        document.getElementById('oeeFilterLine').value = '';
-        document.getElementById('oeeFilterProduk').value = '';
-        updateOEECharts();
-        modal.classList.add('active');
-    }
-
+    // ============ OEE CHARTS ============
+    function showDetailOEE() { let r = getCurrentMonthRange(); document.getElementById('oeeFilterStart').value = r.start; document.getElementById('oeeFilterEnd').value = r.end; document.getElementById('oeeFilterLine').value = ''; document.getElementById('oeeFilterProduk').value = ''; updateOEECharts(); document.getElementById('modalOEE').classList.add('active'); }
     function updateOEECharts() {
-        let startDate = document.getElementById('oeeFilterStart').value;
-        let endDate = document.getElementById('oeeFilterEnd').value;
-        let filterLine = document.getElementById('oeeFilterLine').value;
-        let filterProduk = document.getElementById('oeeFilterProduk').value;
-        
-        if (!startDate || !endDate) return;
-        
-        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
-        
-        let filtered = oeeData.filter(d => {
-            if (d.tanggal < startDate || d.tanggal > endDate) return false;
-            if (filterLine && d.line !== filterLine) return false;
-            if (filterProduk && d.produk !== filterProduk) return false;
-            return true;
-        });
-        
-        if (filtered.length > 0) {
-            let avgOEE = filtered.reduce((sum, d) => sum + parseFloat(d.oee), 0) / filtered.length;
-            let avgAvail = filtered.reduce((sum, d) => sum + parseFloat(d.availability), 0) / filtered.length;
-            let avgPerf = filtered.reduce((sum, d) => sum + parseFloat(d.performance), 0) / filtered.length;
-            let avgQual = filtered.reduce((sum, d) => sum + parseFloat(d.quality), 0) / filtered.length;
-            document.getElementById('oeeAvgValue').innerHTML = avgOEE.toFixed(2) + '%';
-            document.getElementById('oeeAvailValue').innerHTML = avgAvail.toFixed(2) + '%';
-            document.getElementById('oeePerfValue').innerHTML = avgPerf.toFixed(2) + '%';
-            document.getElementById('oeeQualValue').innerHTML = avgQual.toFixed(2) + '%';
-        } else {
-            document.getElementById('oeeAvgValue').innerHTML = '0%';
-            document.getElementById('oeeAvailValue').innerHTML = '0%';
-            document.getElementById('oeePerfValue').innerHTML = '0%';
-            document.getElementById('oeeQualValue').innerHTML = '0%';
+        let start = document.getElementById('oeeFilterStart').value, end = document.getElementById('oeeFilterEnd').value, line = document.getElementById('oeeFilterLine').value, prod = document.getElementById('oeeFilterProduk').value;
+        if(!start||!end) return;
+        let data = JSON.parse(localStorage.getItem('oeeData')||'[]').filter(d=>d.tanggal>=start&&d.tanggal<=end&&(!line||d.line===line)&&(!prod||d.produk===prod));
+        if(data.length){
+            document.getElementById('oeeAvgValue').innerHTML = (data.reduce((a,b)=>a+parseFloat(b.oee),0)/data.length).toFixed(2)+'%';
+            document.getElementById('oeeAvailValue').innerHTML = (data.reduce((a,b)=>a+parseFloat(b.availability),0)/data.length).toFixed(2)+'%';
+            document.getElementById('oeePerfValue').innerHTML = (data.reduce((a,b)=>a+parseFloat(b.performance),0)/data.length).toFixed(2)+'%';
+            document.getElementById('oeeQualValue').innerHTML = (data.reduce((a,b)=>a+parseFloat(b.quality),0)/data.length).toFixed(2)+'%';
         }
+        let monthVal = Array(12).fill(0), monthCnt = Array(12).fill(0);
+        data.forEach(d=>{ let m = parseInt(d.tanggal.substring(5,7))-1; monthVal[m]+=parseFloat(d.oee); monthCnt[m]++; });
+        let monthAvg = monthVal.map((v,i)=>monthCnt[i]?v/monthCnt[i]:0);
+        if(window.oeeChart) window.oeeChart.destroy();
+        window.oeeChart = new Chart(document.getElementById('oeeMonthlyChart'), { type:'line', data:{ labels:['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets:[{ label:'OEE %', data:monthAvg, borderColor:'#22c55e', fill:true }] }, options:{ responsive:true, plugins:{ datalabels:{ formatter:v=>v>0?v.toFixed(1)+'%':'' } } } });
         
-        let currentYear = new Date().getFullYear();
-        let monthlyData = {};
-        for (let i = 1; i <= 12; i++) {
-            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
-            monthlyData[monthKey] = { total: 0, count: 0 };
-        }
-        
-        filtered.forEach(d => {
-            let monthKey = d.tanggal.substring(0, 7);
-            if (monthlyData[monthKey]) {
-                monthlyData[monthKey].total += parseFloat(d.oee);
-                monthlyData[monthKey].count++;
-            }
-        });
-        
-        let monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        let monthValues = [];
-        for (let i = 1; i <= 12; i++) {
-            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
-            let avg = monthlyData[monthKey].count > 0 ? monthlyData[monthKey].total / monthlyData[monthKey].count : 0;
-            monthValues.push(avg);
-        }
-        
-        if (oeeMonthlyChart) oeeMonthlyChart.destroy();
-        let ctxMonthly = document.getElementById('oeeMonthlyChart').getContext('2d');
-        oeeMonthlyChart = new Chart(ctxMonthly, {
-            type: 'line',
-            data: { labels: monthLabels, datasets: [{ label: 'OEE (%)', data: monthValues, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toFixed(1) + '%' : '' } } }
-        });
-        
-        let dailyDowntime = {};
-        filtered.forEach(d => {
-            let downtime = (parseFloat(d.dtAll) || 0) + (parseFloat(d.pdt) || 0);
-            dailyDowntime[d.tanggal] = (dailyDowntime[d.tanggal] || 0) + downtime;
-        });
-        
-        let sortedDates = Object.keys(dailyDowntime).sort();
-        let dailyLabels = sortedDates.slice(-14);
-        let dailyValues = dailyLabels.map(date => dailyDowntime[date]);
-        
-        if (downtimeDailyChart) downtimeDailyChart.destroy();
-        let ctxDaily = document.getElementById('downtimeDailyChart').getContext('2d');
-        downtimeDailyChart = new Chart(ctxDaily, {
-            type: 'bar',
-            data: { labels: dailyLabels, datasets: [{ label: 'Downtime (menit)', data: dailyValues, backgroundColor: '#f59e0b', borderRadius: 6 }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
-        });
+        let daily = {};
+        data.forEach(d=>{ let dt = (d.dtAll||0)+(d.pdt||0); daily[d.tanggal] = (daily[d.tanggal]||0)+dt; });
+        let days = Object.keys(daily).sort().slice(-14);
+        let vals = days.map(d=>daily[d]);
+        if(window.dailyChart) window.dailyChart.destroy();
+        window.dailyChart = new Chart(document.getElementById('downtimeDailyChart'), { type:'bar', data:{ labels:days, datasets:[{ label:'Downtime (menit)', data:vals, backgroundColor:'#f59e0b' }] }, options:{ responsive:true, plugins:{ datalabels:{ formatter:v=>v>0?v.toLocaleString():'' } } } });
     }
+    function resetOEEFilter() { let r = getCurrentMonthRange(); document.getElementById('oeeFilterStart').value = r.start; document.getElementById('oeeFilterEnd').value = r.end; document.getElementById('oeeFilterLine').value = ''; document.getElementById('oeeFilterProduk').value = ''; updateOEECharts(); }
 
-    function resetOEEFilter() {
-        const range = getCurrentMonthRange();
-        document.getElementById('oeeFilterStart').value = range.start;
-        document.getElementById('oeeFilterEnd').value = range.end;
-        document.getElementById('oeeFilterLine').value = '';
-        document.getElementById('oeeFilterProduk').value = '';
-        updateOEECharts();
-    }
-
-    // ============ DASHBOARD LISTRIK ============
-    function showDetailListrik() {
-        const modal = document.getElementById('modalListrik');
-        const range = getCurrentMonthRange();
-        document.getElementById('listrikFilterStart').value = range.start;
-        document.getElementById('listrikFilterEnd').value = range.end;
-        updateListrikCharts();
-        modal.classList.add('active');
-    }
-
+    // ============ LISTRIK CHARTS ============
+    function showDetailListrik() { let r = getCurrentMonthRange(); document.getElementById('listrikFilterStart').value = r.start; document.getElementById('listrikFilterEnd').value = r.end; updateListrikCharts(); document.getElementById('modalListrik').classList.add('active'); }
     function updateListrikCharts() {
-        let startDate = document.getElementById('listrikFilterStart').value;
-        let endDate = document.getElementById('listrikFilterEnd').value;
-        if (!startDate || !endDate) return;
-
-        let listrikData = JSON.parse(localStorage.getItem('listrikData') || '[]');
-        let master = JSON.parse(localStorage.getItem('masterHarga') || '{"hargaPerKwh":1700,"hargaPerM3":5000,"lastUpdate":"2025-01-01"}');
+        let start = document.getElementById('listrikFilterStart').value, end = document.getElementById('listrikFilterEnd').value;
+        if(!start||!end) return;
+        let data = JSON.parse(localStorage.getItem('listrikData')||'[]').filter(l=>l.periodeStart<=end && l.periodeEnd>=start);
+        let total = data.reduce((a,b)=>a+(b.totalKwh||0),0);
+        let harga = JSON.parse(localStorage.getItem('masterHarga')||'{}');
+        document.getElementById('listrikTotalKwh').innerHTML = total.toLocaleString()+' kWh';
+        document.getElementById('listrikTotalBiaya').innerHTML = 'Rp '+(total*(harga.hargaPerKwh||1700)).toLocaleString();
+        document.getElementById('listrikHargaKwh').innerHTML = 'Rp '+(harga.hargaPerKwh||1700).toLocaleString()+' /kWh';
+        document.getElementById('listrikLastUpdate').innerHTML = 'Last Update: '+(harga.lastUpdate?new Date(harga.lastUpdate).toLocaleDateString('id-ID'):'-');
         
-        let filtered = listrikData.filter(l => l.periodeStart <= endDate && l.periodeEnd >= startDate);
+        let monthly = Array(12).fill(0), mesinMonthly = Array(12).fill(0), utilMonthly = Array(12).fill(0);
+        data.forEach(l=>{ let m = parseInt(l.periodeStart.substring(5,7))-1; monthly[m]+=l.totalKwh; mesinMonthly[m]+=l.totalMesinProduksi||l.totalKwh*0.7; utilMonthly[m]+=l.totalUtility||l.totalKwh*0.3; });
+        if(window.listrikTrend) window.listrikTrend.destroy();
+        window.listrikTrend = new Chart(document.getElementById('listrikMonthlyTrendChart'), { type:'line', data:{ labels:['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets:[{ label:'kWh', data:monthly, borderColor:'#f59e0b', fill:true }] }, options:{ responsive:true, plugins:{ datalabels:{ formatter:v=>v>0?v.toLocaleString():'' } } } });
         
-        let totalKwh = filtered.reduce((sum, l) => sum + (l.totalKwh || 0), 0);
-        let totalBiaya = totalKwh * (master.hargaPerKwh || 1700);
+        let totalMesin = data.reduce((a,b)=>a+(b.totalMesinProduksi||b.totalKwh*0.7),0);
+        let totalUtil = data.reduce((a,b)=>a+(b.totalUtility||b.totalKwh*0.3),0);
+        if(window.barChart) window.barChart.destroy();
+        window.barChart = new Chart(document.getElementById('listrikBarChart'), { type:'bar', data:{ labels:['Mesin Produksi','Utility'], datasets:[{ label:'kWh', data:[totalMesin,totalUtil], backgroundColor:['#22c55e','#06b6d4'] }] }, options:{ responsive:true, plugins:{ datalabels:{ formatter:v=>v>0?v.toLocaleString():'' } } } });
         
-        document.getElementById('listrikTotalKwh').innerHTML = totalKwh.toLocaleString() + ' kWh';
-        document.getElementById('listrikTotalBiaya').innerHTML = 'Rp ' + totalBiaya.toLocaleString();
-        document.getElementById('listrikHargaKwh').innerHTML = 'Rp ' + (master.hargaPerKwh || 1700).toLocaleString() + ' /kWh';
-        document.getElementById('listrikLastUpdate').innerHTML = 'Last Update: ' + (master.lastUpdate ? new Date(master.lastUpdate).toLocaleDateString('id-ID') : '-');
-        
-        let currentYear = new Date().getFullYear();
-        let monthlyTotal = {};
-        let monthlyMesin = {};
-        let monthlyUtility = {};
-        
-        for (let i = 1; i <= 12; i++) {
-            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
-            monthlyTotal[monthKey] = 0;
-            monthlyMesin[monthKey] = 0;
-            monthlyUtility[monthKey] = 0;
-        }
-        
-        filtered.forEach(l => {
-            let startYear = parseInt(l.periodeStart.substring(0,4));
-            if (startYear === currentYear) {
-                let monthKey = l.periodeStart.substring(0,7);
-                if (monthlyTotal[monthKey] !== undefined) {
-                    monthlyTotal[monthKey] += l.totalKwh || 0;
-                    monthlyMesin[monthKey] += (l.totalMesinProduksi || (l.totalKwh * 0.7)) || 0;
-                    monthlyUtility[monthKey] += (l.totalUtility || (l.totalKwh * 0.3)) || 0;
-                }
-            }
-        });
-        
-        let monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        let monthlyValues = [];
-        for (let i = 1; i <= 12; i++) {
-            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
-            monthlyValues.push(monthlyTotal[monthKey] || 0);
-        }
-        
-        if (listrikMonthlyTrendChart) listrikMonthlyTrendChart.destroy();
-        let ctx1 = document.getElementById('listrikMonthlyTrendChart').getContext('2d');
-        listrikMonthlyTrendChart = new Chart(ctx1, {
-            type: 'line',
-            data: { labels: monthNames, datasets: [{ label: 'kWh', data: monthlyValues, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
-        });
-        
-        let totalMesin = filtered.reduce((sum, l) => sum + (l.totalMesinProduksi || (l.totalKwh * 0.7)), 0);
-        let totalUtility = filtered.reduce((sum, l) => sum + (l.totalUtility || (l.totalKwh * 0.3)), 0);
-        
-        if (listrikBarChart) listrikBarChart.destroy();
-        let ctx2 = document.getElementById('listrikBarChart').getContext('2d');
-        listrikBarChart = new Chart(ctx2, {
-            type: 'bar',
-            data: { labels: ['Mesin Produksi', 'Utility'], datasets: [{ label: 'kWh', data: [totalMesin, totalUtility], backgroundColor: ['#22c55e', '#06b6d4'], borderRadius: 8 }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
-        });
-        
-        let mesinValues = [];
-        for (let i = 1; i <= 12; i++) {
-            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
-            mesinValues.push(monthlyMesin[monthKey] || 0);
-        }
-        if (listrikMesinTrendChart) listrikMesinTrendChart.destroy();
-        let ctx3 = document.getElementById('listrikMesinTrendChart').getContext('2d');
-        listrikMesinTrendChart = new Chart(ctx3, {
-            type: 'line',
-            data: { labels: monthNames, datasets: [{ label: 'Mesin Produksi (kWh)', data: mesinValues, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
-        });
-        
-        let utilityValues = [];
-        for (let i = 1; i <= 12; i++) {
-            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
-            utilityValues.push(monthlyUtility[monthKey] || 0);
-        }
-        if (listrikUtilityTrendChart) listrikUtilityTrendChart.destroy();
-        let ctx4 = document.getElementById('listrikUtilityTrendChart').getContext('2d');
-        listrikUtilityTrendChart = new Chart(ctx4, {
-            type: 'line',
-            data: { labels: monthNames, datasets: [{ label: 'Utility (kWh)', data: utilityValues, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
-        });
+        if(window.mesinTrend) window.mesinTrend.destroy();
+        window.mesinTrend = new Chart(document.getElementById('listrikMesinTrendChart'), { type:'line', data:{ labels:['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets:[{ label:'Mesin (kWh)', data:mesinMonthly, borderColor:'#22c55e', fill:true }] }, options:{ responsive:true } });
+        if(window.utilTrend) window.utilTrend.destroy();
+        window.utilTrend = new Chart(document.getElementById('listrikUtilityTrendChart'), { type:'line', data:{ labels:['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets:[{ label:'Utility (kWh)', data:utilMonthly, borderColor:'#06b6d4', fill:true }] }, options:{ responsive:true } });
     }
+    function resetListrikFilter() { let r = getCurrentMonthRange(); document.getElementById('listrikFilterStart').value = r.start; document.getElementById('listrikFilterEnd').value = r.end; updateListrikCharts(); }
 
-    function resetListrikFilter() {
-        const range = getCurrentMonthRange();
-        document.getElementById('listrikFilterStart').value = range.start;
-        document.getElementById('listrikFilterEnd').value = range.end;
-        updateListrikCharts();
-    }
-
-    // ============ DASHBOARD PAM ============
-    function showDetailPam() {
-        const modal = document.getElementById('modalPam');
-        const range = getCurrentMonthRange();
-        document.getElementById('pamFilterStart').value = range.start;
-        document.getElementById('pamFilterEnd').value = range.end;
-        updatePamCharts();
-        modal.classList.add('active');
-    }
-
+    // ============ PAM CHARTS ============
+    function showDetailPam() { let r = getCurrentMonthRange(); document.getElementById('pamFilterStart').value = r.start; document.getElementById('pamFilterEnd').value = r.end; updatePamCharts(); document.getElementById('modalPam').classList.add('active'); }
     function updatePamCharts() {
-        let startDate = document.getElementById('pamFilterStart').value;
-        let endDate = document.getElementById('pamFilterEnd').value;
-        if (!startDate || !endDate) return;
-
-        let pamData = JSON.parse(localStorage.getItem('pamData') || '[]');
-        let master = JSON.parse(localStorage.getItem('masterHarga') || '{"hargaPerKwh":1700,"hargaPerM3":5000,"lastUpdate":"2025-01-01"}');
+        let start = document.getElementById('pamFilterStart').value, end = document.getElementById('pamFilterEnd').value;
+        if(!start||!end) return;
+        let data = JSON.parse(localStorage.getItem('pamData')||'[]').filter(p=>p.periodeStart<=end && p.periodeEnd>=start);
+        let total = data.reduce((a,b)=>a+(b.volume||0),0);
+        let harga = JSON.parse(localStorage.getItem('masterHarga')||'{}');
+        document.getElementById('pamTotalVolume').innerHTML = total.toLocaleString()+' m³';
+        document.getElementById('pamTotalBiaya').innerHTML = 'Rp '+(total*(harga.hargaPerM3||5000)).toLocaleString();
+        document.getElementById('pamHargaM3').innerHTML = 'Rp '+(harga.hargaPerM3||5000).toLocaleString()+' /m³';
+        document.getElementById('pamLastUpdate').innerHTML = 'Last Update: '+(harga.lastUpdate?new Date(harga.lastUpdate).toLocaleDateString('id-ID'):'-');
         
-        let filtered = pamData.filter(p => p.periodeStart <= endDate && p.periodeEnd >= startDate);
-        
-        let totalVolume = filtered.reduce((sum, p) => sum + (p.volume || 0), 0);
-        let totalBiaya = totalVolume * (master.hargaPerM3 || 5000);
-        
-        document.getElementById('pamTotalVolume').innerHTML = totalVolume.toLocaleString() + ' m³';
-        document.getElementById('pamTotalBiaya').innerHTML = 'Rp ' + totalBiaya.toLocaleString();
-        document.getElementById('pamHargaM3').innerHTML = 'Rp ' + (master.hargaPerM3 || 5000).toLocaleString() + ' /m³';
-        document.getElementById('pamLastUpdate').innerHTML = 'Last Update: ' + (master.lastUpdate ? new Date(master.lastUpdate).toLocaleDateString('id-ID') : '-');
-        
-        let currentYear = new Date().getFullYear();
-        let monthlyVolume = {};
-        
-        for (let i = 1; i <= 12; i++) {
-            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
-            monthlyVolume[monthKey] = 0;
-        }
-        
-        filtered.forEach(p => {
-            let startYear = parseInt(p.periodeStart.substring(0,4));
-            if (startYear === currentYear) {
-                let monthKey = p.periodeStart.substring(0,7);
-                if (monthlyVolume[monthKey] !== undefined) {
-                    monthlyVolume[monthKey] += p.volume || 0;
-                }
-            }
-        });
-        
-        let monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        let monthlyValues = [];
-        for (let i = 1; i <= 12; i++) {
-            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
-            monthlyValues.push(monthlyVolume[monthKey] || 0);
-        }
-        
-        if (pamMonthlyTrendChart) pamMonthlyTrendChart.destroy();
-        let ctx = document.getElementById('pamMonthlyTrendChart').getContext('2d');
-        pamMonthlyTrendChart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: monthNames, datasets: [{ label: 'Volume Air (m³)', data: monthlyValues, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() + ' m³' : '' } } }
-        });
+        let monthly = Array(12).fill(0);
+        data.forEach(p=>{ let m = parseInt(p.periodeStart.substring(5,7))-1; monthly[m]+=p.volume; });
+        if(window.pamChart) window.pamChart.destroy();
+        window.pamChart = new Chart(document.getElementById('pamMonthlyTrendChart'), { type:'line', data:{ labels:['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], datasets:[{ label:'Volume (m³)', data:monthly, borderColor:'#06b6d4', fill:true }] }, options:{ responsive:true, plugins:{ datalabels:{ formatter:v=>v>0?v.toLocaleString():'' } } } });
     }
+    function resetPamFilter() { let r = getCurrentMonthRange(); document.getElementById('pamFilterStart').value = r.start; document.getElementById('pamFilterEnd').value = r.end; updatePamCharts(); }
 
-    function resetPamFilter() {
-        const range = getCurrentMonthRange();
-        document.getElementById('pamFilterStart').value = range.start;
-        document.getElementById('pamFilterEnd').value = range.end;
-        updatePamCharts();
-    }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
-
-    // ============ CRUD FUNCTIONS ============
-    function initData() {
-        if (!localStorage.getItem('masterHarga')) {
-            localStorage.setItem('masterHarga', JSON.stringify({ hargaPerKwh: 1700, hargaPerM3: 5000, lastUpdate: new Date().toISOString() }));
-        }
-        if (!localStorage.getItem('auditTrail')) localStorage.setItem('auditTrail', JSON.stringify([]));
-        
-        loadDummyData();
-        
-        loadMasterDataInfo();
-        setDefaultFilter();
-        updateDashboard();
-    }
-
-    function loadMasterDataInfo() {
-        let master = JSON.parse(localStorage.getItem('masterHarga') || '{}');
-        document.getElementById('masterDataInfo').innerHTML = `
-            <p><strong>Harga Listrik:</strong> Rp ${(master.hargaPerKwh || 0).toLocaleString()} / kWh</p>
-            <p><strong>Harga Air:</strong> Rp ${(master.hargaPerM3 || 0).toLocaleString()} / m³</p>
-            <p><strong>Terakhir Update:</strong> ${master.lastUpdate ? new Date(master.lastUpdate).toLocaleString('id-ID') : '-'}</p>
-        `;
-        if (document.getElementById('hargaPerKwh')) document.getElementById('hargaPerKwh').value = master.hargaPerKwh || 1700;
-        if (document.getElementById('hargaPerM3')) document.getElementById('hargaPerM3').value = master.hargaPerM3 || 5000;
-    }
-
-    function simpanMasterHarga() {
-        let oldMaster = JSON.parse(localStorage.getItem('masterHarga') || '{}');
-        let newHargaKwh = parseFloat(document.getElementById('hargaPerKwh').value);
-        let newHargaM3 = parseFloat(document.getElementById('hargaPerM3').value);
-        let newMaster = { hargaPerKwh: newHargaKwh, hargaPerM3: newHargaM3, lastUpdate: new Date().toISOString() };
-        
-        let audit = JSON.parse(localStorage.getItem('auditTrail') || '[]');
-        audit.unshift({ id: Date.now(), tanggal: new Date().toLocaleString('id-ID'), jenis: 'Update Harga', oldValue: `Listrik: ${oldMaster.hargaPerKwh} | Air: ${oldMaster.hargaPerM3}`, newValue: `Listrik: ${newHargaKwh} | Air: ${newHargaM3}`, keterangan: 'Perubahan master harga', user: 'Admin' });
-        localStorage.setItem('auditTrail', JSON.stringify(audit.slice(0, 100)));
-        
-        localStorage.setItem('masterHarga', JSON.stringify(newMaster));
-        alert('Master harga tersimpan!');
-        loadMasterDataInfo();
-        updateDashboard();
-        if (document.getElementById('tab-audit').classList.contains('active')) loadAuditList();
-    }
-
-    function loadAuditList() {
-        let audit = JSON.parse(localStorage.getItem('auditTrail') || '[]');
-        let html = `<thead><tr><th>Tanggal</th><th>Jenis</th><th>Nilai Lama</th><th>Nilai Baru</th><th>Keterangan</th><th>User</th></tr></thead><tbody>`;
-        audit.forEach(a => { html += `<tr><td>${a.tanggal}</td><td>${a.jenis}</td><td>${a.oldValue}</td><td>${a.newValue}</td><td>${a.keterangan}</td><td>${a.user}</td></tr>`; });
-        html += `</tbody>`;
-        document.getElementById('auditList').innerHTML = html;
-    }
-
+    // ============ CRUD OEE ============
     function hitungOEE(data) {
-        let jamKerja = parseFloat(data.jamKerja) || 0;
-        let dtAll = parseFloat(data.dtAll) || 0;
-        let pdt = parseFloat(data.pdt) || 0;
-        let hasilFg = parseFloat(data.hasilFg) || 0;
-        let reject = parseFloat(data.reject) || 0;
-        let speed = parseFloat(data.speed) || 0;
-        let isiDus = parseFloat(data.isiDus) || 0;
-        let totalDowntime = dtAll + pdt;
-        let availability = jamKerja > 0 ? ((jamKerja - totalDowntime) / jamKerja) * 100 : 0;
-        let actualOutput = jamKerja > 0 ? (hasilFg * isiDus) / jamKerja : 0;
-        let performance = speed > 0 ? (actualOutput / speed) * 100 : 0;
-        let totalProduksi = hasilFg * isiDus;
-        let quality = totalProduksi > 0 ? ((totalProduksi - reject) / totalProduksi) * 100 : 0;
-        let oee = (availability * performance * quality) / 10000;
-        return { availability: availability.toFixed(2), performance: performance.toFixed(2), quality: quality.toFixed(2), oee: oee.toFixed(2) };
+        let jam = data.jamKerja||0, dt = (data.dtAll||0)+(data.pdt||0);
+        let avail = jam>0?((jam-dt)/jam)*100:0;
+        let totalPcs = (data.hasilFg||0)*(data.isiDus||480);
+        let perf = (totalPcs/(jam*(data.speed||50)))*100;
+        let qual = totalPcs>0?((totalPcs-(data.reject||0))/totalPcs)*100:0;
+        let oee = (avail*perf*qual)/10000;
+        return { availability:avail.toFixed(2), performance:perf.toFixed(2), quality:qual.toFixed(2), oee:oee.toFixed(2) };
     }
-
     function simpanOEE() {
-        let tanggal = document.getElementById('tgl').value;
-        let line = document.getElementById('line').value;
-        if (!tanggal || !line) { alert('Isi tanggal dan line!'); return; }
-        let data = { 
-            id: Date.now(), tanggal, line, 
-            produk: document.getElementById('produk').value, 
-            jamKerja: parseFloat(document.getElementById('jamKerja').value) || 0, 
-            target: parseFloat(document.getElementById('target').value) || 0, 
-            hasilFg: parseFloat(document.getElementById('hasilFg').value) || 0, 
-            reject: parseFloat(document.getElementById('reject').value) || 0, 
-            manPower: parseFloat(document.getElementById('manPower').value) || 0, 
-            speed: parseFloat(document.getElementById('speed').value) || 0, 
-            isiDus: parseFloat(document.getElementById('isiDus').value) || 0, 
-            dtAll: parseFloat(document.getElementById('dtAll').value) || 0, 
-            pdt: parseFloat(document.getElementById('pdt').value) || 0 
-        };
-        let oeeResult = hitungOEE(data);
-        data.availability = oeeResult.availability; 
-        data.performance = oeeResult.performance; 
-        data.quality = oeeResult.quality; 
-        data.oee = oeeResult.oee; 
-        data.bulan = data.tanggal.substring(0,7);
-        
-        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
+        let tgl = document.getElementById('tgl').value;
+        if(!tgl){ alert('Isi tanggal'); return; }
+        let data = { id:Date.now(), tanggal:tgl, line:document.getElementById('line').value, produk:document.getElementById('produk').value, jamKerja:parseFloat(document.getElementById('jamKerja').value)||0, target:parseFloat(document.getElementById('target').value)||0, hasilFg:parseFloat(document.getElementById('hasilFg').value)||0, reject:parseFloat(document.getElementById('reject').value)||0, speed:parseFloat(document.getElementById('speed').value)||50, isiDus:parseFloat(document.getElementById('isiDus').value)||480, dtAll:parseFloat(document.getElementById('dtAll').value)||0, pdt:parseFloat(document.getElementById('pdt').value)||0 };
+        let hitung = hitungOEE(data);
+        data.availability = hitung.availability; data.performance = hitung.performance; data.quality = hitung.quality; data.oee = hitung.oee; data.bulan = tgl.substring(0,7);
+        let oeeData = JSON.parse(localStorage.getItem('oeeData')||'[]');
         oeeData.push(data);
         localStorage.setItem('oeeData', JSON.stringify(oeeData));
-        alert('Data OEE tersimpan!');
-        loadOEEList(); 
-        updateDashboard();
-        
-        document.getElementById('jamKerja').value = '';
-        document.getElementById('target').value = '';
-        document.getElementById('hasilFg').value = '';
-        document.getElementById('reject').value = '';
-        document.getElementById('manPower').value = '';
-        document.getElementById('speed').value = '';
-        document.getElementById('isiDus').value = '';
-        document.getElementById('dtAll').value = '';
-        document.getElementById('pdt').value = '';
+        alert('Data tersimpan! OEE: '+hitung.oee+'%');
+        loadOEEList(); updateDashboard();
     }
-
     function loadOEEList() {
-        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
-        oeeData.sort((a,b) => b.tanggal.localeCompare(a.tanggal));
-        let html = `<thead><tr><th>Tanggal</th><th>Line</th><th>Produk</th><th>Target</th><th>Hasil FG</th><th>OEE</th><th>Aksi</th></tr></thead><tbody>`;
-        oeeData.slice(0, 20).forEach(d => { 
-            html += `<tr>
-                <td>${d.tanggal}</td>
-                <td>${d.line}</td>
-                <td>${d.produk}</td>
-                <td>${d.target}</td>
-                <td>${d.hasilFg}</td>
-                <td style="background:${d.oee>=85?'#d4edda':(d.oee>=70?'#fff3cd':'#f8d7da')};font-weight:bold;">${d.oee}%</td>
-                <td><button class="btn-delete" onclick="hapusOEE(${d.id})">Hapus</button></td>
-            </tr>`;
+        let data = JSON.parse(localStorage.getItem('oeeData')||'[]');
+        let filter = document.getElementById('filterOEE')?.value.toLowerCase()||'';
+        let filtered = data.filter(d=>!filter||d.line.toLowerCase().includes(filter)||d.produk.toLowerCase().includes(filter));
+        filtered.sort((a,b)=>b.tanggal.localeCompare(a.tanggal));
+        let html = '';
+        filtered.slice(0,30).forEach(d=>{
+            let cls = d.oee>=85?'high':(d.oee>=70?'medium':'low');
+            html += `<tr><td>${d.tanggal}</td><td>${d.line}</td><td>${d.produk}</td><td>${d.target}</td><td>${d.hasilFg}</td><td><span class="badge-oee ${cls}">${d.oee}%</span></td><td><button class="btn-delete" onclick="hapusOEE(${d.id})">Hapus</button></td></tr>`;
         });
-        html += `</tbody>`;
-        document.getElementById('oeeList').innerHTML = html || '<p>Tidak ada data</p>';
+        document.getElementById('oeeListBody').innerHTML = html || '<tr><td colspan="7">Tidak ada data</td></tr>';
     }
+    function hapusOEE(id){ let data=JSON.parse(localStorage.getItem('oeeData')||'[]'); localStorage.setItem('oeeData',JSON.stringify(data.filter(d=>d.id!==id))); loadOEEList(); updateDashboard(); }
 
-    function hapusOEE(id) { 
-        let data = JSON.parse(localStorage.getItem('oeeData') || '[]'); 
-        localStorage.setItem('oeeData', JSON.stringify(data.filter(d => d.id !== id))); 
-        loadOEEList(); 
-        updateDashboard(); 
-    }
-
+    // ============ CRUD LISTRIK ============
     function simpanListrik() {
-        let start = document.getElementById('listrikStart').value;
-        let end = document.getElementById('listrikEnd').value;
-        if (!start || !end) { alert('Isi periode!'); return; }
-        
-        let mixing = parseFloat(document.getElementById('mixingKwh').value) || 0;
-        let transfer = parseFloat(document.getElementById('transferKwh').value) || 0;
-        let filling1 = parseFloat(document.getElementById('filling1Kwh').value) || 0;
-        let filling2 = parseFloat(document.getElementById('filling2Kwh').value) || 0;
-        let hvac = parseFloat(document.getElementById('hvacKwh').value) || 0;
-        let kompresor = parseFloat(document.getElementById('kompresorKwh').value) || 0;
-        
-        let totalMesin = mixing + transfer + filling1 + filling2;
-        let totalUtility = hvac + kompresor;
-        let totalKwh = totalMesin + totalUtility;
-        
-        if (totalKwh === 0) { alert('Isi minimal satu komponen listrik!'); return; }
-        
-        let data = { 
-            id: Date.now(), 
-            periodeStart: start, 
-            periodeEnd: end, 
-            totalMesinProduksi: totalMesin, 
-            totalUtility: totalUtility, 
-            totalKwh: totalKwh 
-        };
-        
-        let listrikData = JSON.parse(localStorage.getItem('listrikData') || '[]');
-        listrikData.push(data);
-        localStorage.setItem('listrikData', JSON.stringify(listrikData));
-        alert('Data listrik tersimpan!');
-        loadListrikList(); 
-        updateDashboard();
-        
-        document.getElementById('mixingKwh').value = '';
-        document.getElementById('transferKwh').value = '';
-        document.getElementById('filling1Kwh').value = '';
-        document.getElementById('filling2Kwh').value = '';
-        document.getElementById('hvacKwh').value = '';
-        document.getElementById('kompresorKwh').value = '';
+        let start = document.getElementById('listrikStart').value, end = document.getElementById('listrikEnd').value;
+        if(!start||!end){ alert('Isi periode'); return; }
+        let mixing = parseFloat(document.getElementById('mixingKwh').value)||0, transfer = parseFloat(document.getElementById('transferKwh').value)||0;
+        let filling1 = parseFloat(document.getElementById('filling1Kwh').value)||0, filling2 = parseFloat(document.getElementById('filling2Kwh').value)||0;
+        let hvac = parseFloat(document.getElementById('hvacKwh').value)||0, kompresor = parseFloat(document.getElementById('kompresorKwh').value)||0;
+        let totalMesin = mixing+transfer+filling1+filling2, totalUtil = hvac+kompresor, total = totalMesin+totalUtil;
+        if(total===0){ alert('Isi minimal satu komponen'); return; }
+        let data = { id:Date.now(), periodeStart:start, periodeEnd:end, totalMesinProduksi:totalMesin, totalUtility:totalUtil, totalKwh:total };
+        let listrik = JSON.parse(localStorage.getItem('listrikData')||'[]');
+        listrik.push(data);
+        localStorage.setItem('listrikData', JSON.stringify(listrik));
+        alert('Data listrik tersimpan! Total: '+total.toFixed(2)+' kWh');
+        loadListrikList(); updateDashboard();
     }
-
     function loadListrikList() {
-        let data = JSON.parse(localStorage.getItem('listrikData') || '[]');
-        data.sort((a,b) => b.periodeStart.localeCompare(a.periodeStart));
-        let html = `<thead><tr><th>Periode Start</th><th>Periode End</th><th>Total kWh</th><th>Aksi</th></tr></thead><tbody>`;
-        data.forEach(d => { 
-            html += `<tr>
-                <td>${d.periodeStart}</td>
-                <td>${d.periodeEnd}</td>
-                <td><strong>${d.totalKwh.toLocaleString()}</strong> kWh</td>
-                <td><button class="btn-delete" onclick="hapusListrik(${d.id})">Hapus</button></td>
-            </tr>`;
-        });
-        html += `</tbody>`;
-        document.getElementById('listrikList').innerHTML = html || '<p>Tidak ada data</p>';
+        let data = JSON.parse(localStorage.getItem('listrikData')||'[]');
+        data.sort((a,b)=>b.periodeStart.localeCompare(a.periodeStart));
+        let html = '';
+        data.forEach(d=>{ html += `<tr><td>${d.periodeStart}</td><td>${d.periodeEnd}</td><td><strong>${d.totalKwh.toLocaleString()}</strong> kWh</td><td><button class="btn-delete" onclick="hapusListrik(${d.id})">Hapus</button></td></tr>`; });
+        document.getElementById('listrikListBody').innerHTML = html || '<tr><td colspan="4">Tidak ada data</td></tr>';
     }
+    function hapusListrik(id){ let data=JSON.parse(localStorage.getItem('listrikData')||'[]'); localStorage.setItem('listrikData',JSON.stringify(data.filter(d=>d.id!==id))); loadListrikList(); updateDashboard(); }
 
-    function hapusListrik(id) { 
-        let data = JSON.parse(localStorage.getItem('listrikData') || '[]'); 
-        localStorage.setItem('listrikData', JSON.stringify(data.filter(d => d.id !== id))); 
-        loadListrikList(); 
-        updateDashboard(); 
-    }
-
+    // ============ CRUD PAM ============
     function simpanPam() {
-        let start = document.getElementById('pamStart').value;
-        let end = document.getElementById('pamEnd').value;
-        let volume = parseFloat(document.getElementById('volPam').value) || 0;
-        if (!start || !end || volume === 0) { alert('Isi semua data PAM!'); return; }
-        
-        let data = { id: Date.now(), periodeStart: start, periodeEnd: end, volume: volume };
-        let pamData = JSON.parse(localStorage.getItem('pamData') || '[]');
-        pamData.push(data);
-        localStorage.setItem('pamData', JSON.stringify(pamData));
+        let start = document.getElementById('pamStart').value, end = document.getElementById('pamEnd').value, vol = parseFloat(document.getElementById('volPam').value)||0;
+        if(!start||!end||vol===0){ alert('Isi semua data'); return; }
+        let data = { id:Date.now(), periodeStart:start, periodeEnd:end, volume:vol };
+        let pam = JSON.parse(localStorage.getItem('pamData')||'[]');
+        pam.push(data);
+        localStorage.setItem('pamData', JSON.stringify(pam));
         alert('Data PAM tersimpan!');
-        loadPamList(); 
-        updateDashboard();
-        document.getElementById('volPam').value = '';
+        loadPamList(); updateDashboard();
     }
-
     function loadPamList() {
-        let data = JSON.parse(localStorage.getItem('pamData') || '[]');
-        data.sort((a,b) => b.periodeStart.localeCompare(a.periodeStart));
-        let html = `<thead><tr><th>Periode Start</th><th>Periode End</th><th>Volume (m³)</th><th>Aksi</th></tr></thead><tbody>`;
-        data.forEach(d => { 
-            html += `<td>${d.periodeStart}</td><td>${d.periodeEnd}</td><td>${d.volume.toLocaleString()} m³</td>
-                <td><button class="btn-delete" onclick="hapusPam(${d.id})">Hapus</button></td>
-            </tr>`;
-        });
-        html += `</tbody>`;
-        document.getElementById('pamList').innerHTML = html || '<p>Tidak ada data</p>';
+        let data = JSON.parse(localStorage.getItem('pamData')||'[]');
+        data.sort((a,b)=>b.periodeStart.localeCompare(a.periodeStart));
+        let html = '';
+        data.forEach(d=>{ html += `<tr><td>${d.periodeStart}</td><td>${d.periodeEnd}</td><td>${d.volume.toLocaleString()} m³</td><td><button class="btn-delete" onclick="hapusPam(${d.id})">Hapus</button></td></tr>`; });
+        document.getElementById('pamListBody').innerHTML = html || '<tr><td colspan="4">Tidak ada data</td></tr>';
     }
+    function hapusPam(id){ let data=JSON.parse(localStorage.getItem('pamData')||'[]'); localStorage.setItem('pamData',JSON.stringify(data.filter(d=>d.id!==id))); loadPamList(); updateDashboard(); }
 
-    function hapusPam(id) { 
-        let data = JSON.parse(localStorage.getItem('pamData') || '[]'); 
-        localStorage.setItem('pamData', JSON.stringify(data.filter(d => d.id !== id))); 
-        loadPamList(); 
-        updateDashboard(); 
+    // ============ MASTER & AUDIT ============
+    function simpanMasterHarga() {
+        let old = JSON.parse(localStorage.getItem('masterHarga')||'{}');
+        let newMaster = { hargaPerKwh:parseFloat(document.getElementById('hargaPerKwh').value), hargaPerM3:parseFloat(document.getElementById('hargaPerM3').value), lastUpdate:new Date().toISOString() };
+        let audit = JSON.parse(localStorage.getItem('auditTrail')||'[]');
+        audit.unshift({ id:Date.now(), tanggal:new Date().toLocaleString('id-ID'), jenis:'Update Harga', oldValue:`Listrik:${old.hargaPerKwh}|Air:${old.hargaPerM3}`, newValue:`Listrik:${newMaster.hargaPerKwh}|Air:${newMaster.hargaPerM3}`, user:'Admin' });
+        localStorage.setItem('auditTrail', JSON.stringify(audit.slice(0,100)));
+        localStorage.setItem('masterHarga', JSON.stringify(newMaster));
+        alert('Master harga tersimpan!');
+        loadMasterInfo(); updateDashboard();
+    }
+    function loadMasterInfo() {
+        let m = JSON.parse(localStorage.getItem('masterHarga')||'{}');
+        document.getElementById('masterDataInfo').innerHTML = `<p>Harga Listrik: Rp ${(m.hargaPerKwh||0).toLocaleString()}/kWh</p><p>Harga Air: Rp ${(m.hargaPerM3||0).toLocaleString()}/m³</p><p>Update: ${m.lastUpdate?new Date(m.lastUpdate).toLocaleString('id-ID'):'-'}</p>`;
+    }
+    function loadAudit() {
+        let audit = JSON.parse(localStorage.getItem('auditTrail')||'[]');
+        let html = '';
+        audit.forEach(a=>{ html += `<tr><td>${a.tanggal}</td><td>${a.jenis}</td><td>${a.oldValue}</td><td>${a.newValue}</td><td>${a.user}</td></tr>`; });
+        document.getElementById('auditListBody').innerHTML = html || '<tr><td colspan="5">Belum ada perubahan</td></tr>';
     }
 
     // ============ NAVIGATION ============
     function switchTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
         document.getElementById(`tab-${tab}`).classList.add('active');
         event.target.classList.add('active');
-        
-        if (tab === 'dashboard') updateDashboard();
-        if (tab === 'input') { loadOEEList(); loadListrikList(); loadPamList(); }
-        if (tab === 'audit') loadAuditList();
-        if (tab === 'management') loadMasterDataInfo();
+        if(tab==='dashboard') updateDashboard();
+        if(tab==='input') { loadOEEList(); loadListrikList(); loadPamList(); }
+        if(tab==='management') loadMasterInfo();
+        if(tab==='audit') loadAudit();
     }
-
     function switchInputPanel(panel) {
-        document.querySelectorAll('.input-panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.input-nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.input-panel').forEach(p=>p.classList.remove('active'));
+        document.querySelectorAll('.input-nav-btn').forEach(b=>b.classList.remove('active'));
         document.getElementById(`input-${panel}`).classList.add('active');
         event.target.classList.add('active');
-        
-        if (panel === 'oee') loadOEEList();
-        if (panel === 'listrik') loadListrikList();
-        if (panel === 'pam') loadPamList();
+        if(panel==='oee') loadOEEList();
+        if(panel==='listrik') loadListrikList();
+        if(panel==='pam') loadPamList();
     }
 
     // INIT
-    initData();
-    loadOEEList(); 
-    loadListrikList(); 
-    loadPamList();
+    seedDummyData();
+    let r = getCurrentMonthRange();
+    document.getElementById('filterStartDate').value = r.start;
+    document.getElementById('filterEndDate').value = r.end;
+    loadMasterInfo();
+    updateDashboard();
+    loadOEEList(); loadListrikList(); loadPamList();
 </script>
 </body>
 </html>
