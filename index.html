@@ -672,7 +672,7 @@
         };
     }
 
-    function setALAM MUSTIKA HIJAUaultFilter() {
+    function setDefaultFilter() {
         const range = getCurrentMonthRange();
         document.getElementById('filterStartDate').value = range.start;
         document.getElementById('filterEndDate').value = range.end;
@@ -836,7 +836,7 @@
         if (!localStorage.getItem('listrikData')) localStorage.setItem('listrikData', JSON.stringify([]));
         if (!localStorage.getItem('pamData')) localStorage.setItem('pamData', JSON.stringify([]));
         loadMasterDataInfo();
-        setALAM MUSTIKA HIJAUaultFilter();
+        setDefaultFilter();
         updateDashboard();
     }
 
