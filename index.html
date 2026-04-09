@@ -153,7 +153,7 @@
 
         .scorecard-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 24px;
         }
@@ -171,11 +171,15 @@
             text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             border-top: 4px solid #2a7a4a;
-            cursor: pointer;
+            cursor: default;
             transition: transform 0.2s;
         }
 
-        .score-card:hover {
+        .score-card.clickable {
+            cursor: pointer;
+        }
+
+        .score-card.clickable:hover {
             transform: translateY(-3px);
         }
 
@@ -191,12 +195,18 @@
             margin-top: 8px;
         }
 
+        .score-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
         .chart-container {
             margin-bottom: 20px;
+            position: relative;
         }
 
         canvas {
-            max-height: 320px;
+            max-height: 350px;
             width: 100%;
         }
 
@@ -392,6 +402,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -423,22 +434,101 @@
         </div>
 
         <div class="scorecard-container">
-            <div class="score-card" onclick="showDetailOEE()">
+            <div class="score-card clickable" onclick="showDetailOEE()">
+                <div class="score-icon">🏭</div>
                 <div class="value" id="scoreOEE">0%</div>
                 <div class="label">Overall Equipment Effectiveness</div>
                 <div class="click-hint">👆 Klik untuk detail</div>
             </div>
-            <div class="score-card" onclick="showDetailListrik()">
+            <div class="score-card clickable" onclick="showDetailListrik()">
+                <div class="score-icon">⚡</div>
                 <div class="value" id="scoreListrikKwh">0 kWh</div>
                 <div class="label">Pemakaian Listrik</div>
                 <div style="font-size: 12px;">Biaya: <span id="scoreListrikBiaya">Rp 0</span></div>
                 <div class="click-hint">👆 Klik untuk detail</div>
             </div>
-            <div class="score-card" onclick="showDetailPam()">
+            <div class="score-card clickable" onclick="showDetailPam()">
+                <div class="score-icon">💧</div>
                 <div class="value" id="scorePamVolume">0 m³</div>
                 <div class="label">Pemakaian PAM</div>
                 <div style="font-size: 12px;">Biaya: <span id="scorePamBiaya">Rp 0</span></div>
                 <div class="click-hint">👆 Klik untuk detail</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DASHBOARD OEE ==================== -->
+    <div id="modalOEE" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏭 Dashboard OEE - PT ALAM MUSTIKA HIJAU</h2>
+                <button class="close-modal" onclick="closeModal('modalOEE')">&times;</button>
+            </div>
+            <div>
+                <div class="filter-bar-dashboard" style="margin-bottom: 20px;">
+                    <div class="filter-group">
+                        <label>📅 Tanggal Start</label>
+                        <input type="date" id="oeeFilterStart" onchange="updateOEECharts()">
+                    </div>
+                    <div class="filter-group">
+                        <label>📅 Tanggal End</label>
+                        <input type="date" id="oeeFilterEnd" onchange="updateOEECharts()">
+                    </div>
+                    <div class="filter-group">
+                        <label>🏭 Line</label>
+                        <select id="oeeFilterLine" onchange="updateOEECharts()">
+                            <option value="">Semua Line</option>
+                            <option value="Line 1">Line 1</option>
+                            <option value="Line 2">Line 2</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>📦 Produk</label>
+                        <select id="oeeFilterProduk" onchange="updateOEECharts()">
+                            <option value="">Semua Produk</option>
+                            <option value="Kaldu Sapi">Kaldu Sapi</option>
+                            <option value="Kaldu Ayam">Kaldu Ayam</option>
+                        </select>
+                    </div>
+                    <button class="btn-filter reset" onclick="resetOEEFilter()">🔄 Reset</button>
+                </div>
+
+                <div class="scorecard-container" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+                    <div class="score-card">
+                        <div class="score-icon">📊</div>
+                        <div class="value" id="oeeAvgValue">0%</div>
+                        <div class="label">Rata-rata OEE</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-icon">⏱️</div>
+                        <div class="value" id="oeeAvailValue">0%</div>
+                        <div class="label">Availability</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-icon">⚡</div>
+                        <div class="value" id="oeePerfValue">0%</div>
+                        <div class="label">Performance</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-icon">✅</div>
+                        <div class="value" id="oeeQualValue">0%</div>
+                        <div class="label">Quality</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📈 Trend OEE per Bulan (Tahun Berjalan)</div>
+                    <div class="chart-container">
+                        <canvas id="oeeMonthlyChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">⏱️ Trend Downtime per Hari (14 Hari Terakhir)</div>
+                    <div class="chart-container">
+                        <canvas id="downtimeDailyChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -450,7 +540,7 @@
                 <h2>⚡ Dashboard Pemakaian Listrik - PT ALAM MUSTIKA HIJAU</h2>
                 <button class="close-modal" onclick="closeModal('modalListrik')">&times;</button>
             </div>
-            <div id="modalListrikContent">
+            <div>
                 <div class="filter-bar-dashboard" style="margin-bottom: 20px;">
                     <div class="filter-group">
                         <label>📅 Tanggal Start</label>
@@ -463,24 +553,25 @@
                     <button class="btn-filter reset" onclick="resetListrikFilter()">🔄 Reset ke Bulan Ini</button>
                 </div>
 
-                <!-- 3 Score Card: Total Pemakaian, Total Biaya, Harga + Last Update -->
                 <div class="scorecard-container" style="margin-bottom: 24px;">
-                    <div class="score-card" style="cursor: default;">
+                    <div class="score-card">
+                        <div class="score-icon">⚡</div>
                         <div class="value" id="listrikTotalKwh">0 kWh</div>
                         <div class="label">Total Pemakaian Listrik</div>
                     </div>
-                    <div class="score-card" style="cursor: default;">
+                    <div class="score-card">
+                        <div class="score-icon">💰</div>
                         <div class="value" id="listrikTotalBiaya">Rp 0</div>
                         <div class="label">Total Biaya Listrik</div>
                     </div>
-                    <div class="score-card" style="cursor: default;">
+                    <div class="score-card">
+                        <div class="score-icon">🏷️</div>
                         <div class="value" id="listrikHargaKwh">Rp 0 /kWh</div>
                         <div class="label">Harga Listrik Saat Ini</div>
                         <div style="font-size: 11px; color: #6c757d; margin-top: 6px;" id="listrikLastUpdate">Last Update: -</div>
                     </div>
                 </div>
 
-                <!-- Grafik 1: Trend Pemakaian Listrik per Bulan -->
                 <div class="card">
                     <div class="card-title">📈 Trend Pemakaian Listrik per Bulan (Tahun Berjalan)</div>
                     <div class="chart-container">
@@ -488,7 +579,6 @@
                     </div>
                 </div>
 
-                <!-- Grafik 2: Vertical Bar Mesin Produksi VS Utility -->
                 <div class="card">
                     <div class="card-title">📊 Perbandingan Mesin Produksi vs Utility</div>
                     <div class="chart-container">
@@ -496,7 +586,6 @@
                     </div>
                 </div>
 
-                <!-- Grafik 3 & 4: Trend Mesin Produksi & Utility per Bulan -->
                 <div class="chart-row">
                     <div class="card">
                         <div class="card-title">🔧 Trend Pemakaian Listrik Mesin Produksi</div>
@@ -515,30 +604,51 @@
         </div>
     </div>
 
-    <!-- MODAL OEE & PAM SEMENTARA -->
-    <div id="modalOEE" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>🏭 Dashboard OEE</h2>
-                <button class="close-modal" onclick="closeModal('modalOEE')">&times;</button>
-            </div>
-            <div style="padding: 20px; text-align: center;">
-                <p>📌 Dashboard OEE sedang dalam pengembangan.</p>
-                <p>Fitur: Filter tanggal, Line, Produk, Grafik trend OEE, Grafik downtime.</p>
-                <button class="btn-filter" onclick="closeModal('modalOEE')">Tutup</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- ==================== MODAL DASHBOARD PAM ==================== -->
     <div id="modalPam" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>💧 Dashboard PAM</h2>
+                <h2>💧 Dashboard Pemakaian PAM - PT ALAM MUSTIKA HIJAU</h2>
                 <button class="close-modal" onclick="closeModal('modalPam')">&times;</button>
             </div>
-            <div style="padding: 20px; text-align: center;">
-                <p>📌 Dashboard PAM sedang dalam pengembangan.</p>
-                <button class="btn-filter" onclick="closeModal('modalPam')">Tutup</button>
+            <div>
+                <div class="filter-bar-dashboard" style="margin-bottom: 20px;">
+                    <div class="filter-group">
+                        <label>📅 Tanggal Start</label>
+                        <input type="date" id="pamFilterStart" onchange="updatePamCharts()">
+                    </div>
+                    <div class="filter-group">
+                        <label>📅 Tanggal End</label>
+                        <input type="date" id="pamFilterEnd" onchange="updatePamCharts()">
+                    </div>
+                    <button class="btn-filter reset" onclick="resetPamFilter()">🔄 Reset ke Bulan Ini</button>
+                </div>
+
+                <div class="scorecard-container" style="margin-bottom: 24px;">
+                    <div class="score-card">
+                        <div class="score-icon">💧</div>
+                        <div class="value" id="pamTotalVolume">0 m³</div>
+                        <div class="label">Total Pemakaian Air</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-icon">💰</div>
+                        <div class="value" id="pamTotalBiaya">Rp 0</div>
+                        <div class="label">Total Biaya Air</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-icon">🏷️</div>
+                        <div class="value" id="pamHargaM3">Rp 0 /m³</div>
+                        <div class="label">Harga Air Saat Ini</div>
+                        <div style="font-size: 11px; color: #6c757d; margin-top: 6px;" id="pamLastUpdate">Last Update: -</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📈 Trend Pemakaian Air per Bulan (Tahun Berjalan)</div>
+                    <div class="chart-container">
+                        <canvas id="pamMonthlyTrendChart" style="max-height: 350px;"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -648,10 +758,23 @@
 
 <script>
     // ============ GLOBAL CHARTS ============
+    let oeeMonthlyChart = null;
+    let downtimeDailyChart = null;
     let listrikMonthlyTrendChart = null;
     let listrikBarChart = null;
     let listrikMesinTrendChart = null;
     let listrikUtilityTrendChart = null;
+    let pamMonthlyTrendChart = null;
+
+    // Plugin untuk label di chart
+    Chart.register(ChartDataLabels);
+    Chart.defaults.set('plugins.datalabels', {
+        color: '#1e5c3c',
+        anchor: 'end',
+        align: 'top',
+        offset: 4,
+        font: { weight: 'bold', size: 11 }
+    });
 
     // ============ HELPER ============
     function getCurrentMonthRange() {
@@ -706,7 +829,111 @@
     function applyFilter() { updateDashboard(); }
     function resetFilterToCurrentMonth() { const range = getCurrentMonthRange(); document.getElementById('filterStartDate').value = range.start; document.getElementById('filterEndDate').value = range.end; updateDashboard(); }
 
-    // ============ DASHBOARD LISTRIK DETAIL ============
+    // ============ DASHBOARD OEE ============
+    function showDetailOEE() {
+        const modal = document.getElementById('modalOEE');
+        const range = getCurrentMonthRange();
+        document.getElementById('oeeFilterStart').value = range.start;
+        document.getElementById('oeeFilterEnd').value = range.end;
+        document.getElementById('oeeFilterLine').value = '';
+        document.getElementById('oeeFilterProduk').value = '';
+        updateOEECharts();
+        modal.classList.add('active');
+    }
+
+    function updateOEECharts() {
+        let startDate = document.getElementById('oeeFilterStart').value;
+        let endDate = document.getElementById('oeeFilterEnd').value;
+        let filterLine = document.getElementById('oeeFilterLine').value;
+        let filterProduk = document.getElementById('oeeFilterProduk').value;
+        
+        if (!startDate || !endDate) return;
+        
+        let oeeData = JSON.parse(localStorage.getItem('oeeData') || '[]');
+        
+        let filtered = oeeData.filter(d => {
+            if (d.tanggal < startDate || d.tanggal > endDate) return false;
+            if (filterLine && d.line !== filterLine) return false;
+            if (filterProduk && d.produk !== filterProduk) return false;
+            return true;
+        });
+        
+        if (filtered.length > 0) {
+            let avgOEE = filtered.reduce((sum, d) => sum + parseFloat(d.oee), 0) / filtered.length;
+            let avgAvail = filtered.reduce((sum, d) => sum + parseFloat(d.availability), 0) / filtered.length;
+            let avgPerf = filtered.reduce((sum, d) => sum + parseFloat(d.performance), 0) / filtered.length;
+            let avgQual = filtered.reduce((sum, d) => sum + parseFloat(d.quality), 0) / filtered.length;
+            document.getElementById('oeeAvgValue').innerHTML = avgOEE.toFixed(2) + '%';
+            document.getElementById('oeeAvailValue').innerHTML = avgAvail.toFixed(2) + '%';
+            document.getElementById('oeePerfValue').innerHTML = avgPerf.toFixed(2) + '%';
+            document.getElementById('oeeQualValue').innerHTML = avgQual.toFixed(2) + '%';
+        } else {
+            document.getElementById('oeeAvgValue').innerHTML = '0%';
+            document.getElementById('oeeAvailValue').innerHTML = '0%';
+            document.getElementById('oeePerfValue').innerHTML = '0%';
+            document.getElementById('oeeQualValue').innerHTML = '0%';
+        }
+        
+        let currentYear = new Date().getFullYear();
+        let monthlyData = {};
+        for (let i = 1; i <= 12; i++) {
+            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
+            monthlyData[monthKey] = { total: 0, count: 0 };
+        }
+        
+        filtered.forEach(d => {
+            let monthKey = d.tanggal.substring(0, 7);
+            if (monthlyData[monthKey]) {
+                monthlyData[monthKey].total += parseFloat(d.oee);
+                monthlyData[monthKey].count++;
+            }
+        });
+        
+        let monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        let monthValues = [];
+        for (let i = 1; i <= 12; i++) {
+            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
+            let avg = monthlyData[monthKey].count > 0 ? monthlyData[monthKey].total / monthlyData[monthKey].count : 0;
+            monthValues.push(avg);
+        }
+        
+        if (oeeMonthlyChart) oeeMonthlyChart.destroy();
+        let ctxMonthly = document.getElementById('oeeMonthlyChart').getContext('2d');
+        oeeMonthlyChart = new Chart(ctxMonthly, {
+            type: 'line',
+            data: { labels: monthLabels, datasets: [{ label: 'OEE (%)', data: monthValues, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.3, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toFixed(1) + '%' : '' } } }
+        });
+        
+        let dailyDowntime = {};
+        filtered.forEach(d => {
+            let downtime = (parseFloat(d.dtAll) || 0) + (parseFloat(d.pdt) || 0);
+            dailyDowntime[d.tanggal] = (dailyDowntime[d.tanggal] || 0) + downtime;
+        });
+        
+        let sortedDates = Object.keys(dailyDowntime).sort();
+        let dailyLabels = sortedDates.slice(-14);
+        let dailyValues = dailyLabels.map(date => dailyDowntime[date]);
+        
+        if (downtimeDailyChart) downtimeDailyChart.destroy();
+        let ctxDaily = document.getElementById('downtimeDailyChart').getContext('2d');
+        downtimeDailyChart = new Chart(ctxDaily, {
+            type: 'bar',
+            data: { labels: dailyLabels, datasets: [{ label: 'Downtime (menit)', data: dailyValues, backgroundColor: '#f59e0b', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
+        });
+    }
+
+    function resetOEEFilter() {
+        const range = getCurrentMonthRange();
+        document.getElementById('oeeFilterStart').value = range.start;
+        document.getElementById('oeeFilterEnd').value = range.end;
+        document.getElementById('oeeFilterLine').value = '';
+        document.getElementById('oeeFilterProduk').value = '';
+        updateOEECharts();
+    }
+
+    // ============ DASHBOARD LISTRIK ============
     function showDetailListrik() {
         const modal = document.getElementById('modalListrik');
         const range = getCurrentMonthRange();
@@ -770,7 +997,7 @@
         listrikMonthlyTrendChart = new Chart(ctx1, {
             type: 'line',
             data: { labels: monthNames, datasets: [{ label: 'kWh', data: monthlyValues, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true }
+            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
         });
         
         let totalMesin = filtered.reduce((sum, l) => sum + (l.totalMesinProduksi || (l.totalKwh * 0.7)), 0);
@@ -781,7 +1008,7 @@
         listrikBarChart = new Chart(ctx2, {
             type: 'bar',
             data: { labels: ['Mesin Produksi', 'Utility'], datasets: [{ label: 'kWh', data: [totalMesin, totalUtility], backgroundColor: ['#22c55e', '#06b6d4'], borderRadius: 8 }] },
-            options: { responsive: true, maintainAspectRatio: true }
+            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
         });
         
         let mesinValues = [];
@@ -794,7 +1021,7 @@
         listrikMesinTrendChart = new Chart(ctx3, {
             type: 'line',
             data: { labels: monthNames, datasets: [{ label: 'Mesin Produksi (kWh)', data: mesinValues, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true }
+            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
         });
         
         let utilityValues = [];
@@ -807,7 +1034,7 @@
         listrikUtilityTrendChart = new Chart(ctx4, {
             type: 'line',
             data: { labels: monthNames, datasets: [{ label: 'Utility (kWh)', data: utilityValues, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true }
+            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() : '' } } }
         });
     }
 
@@ -818,8 +1045,75 @@
         updateListrikCharts();
     }
 
-    function showDetailOEE() { document.getElementById('modalOEE').classList.add('active'); }
-    function showDetailPam() { document.getElementById('modalPam').classList.add('active'); }
+    // ============ DASHBOARD PAM ============
+    function showDetailPam() {
+        const modal = document.getElementById('modalPam');
+        const range = getCurrentMonthRange();
+        document.getElementById('pamFilterStart').value = range.start;
+        document.getElementById('pamFilterEnd').value = range.end;
+        updatePamCharts();
+        modal.classList.add('active');
+    }
+
+    function updatePamCharts() {
+        let startDate = document.getElementById('pamFilterStart').value;
+        let endDate = document.getElementById('pamFilterEnd').value;
+        if (!startDate || !endDate) return;
+
+        let pamData = JSON.parse(localStorage.getItem('pamData') || '[]');
+        let master = JSON.parse(localStorage.getItem('masterHarga') || '{"hargaPerKwh":1700,"hargaPerM3":5000,"lastUpdate":"2025-01-01"}');
+        
+        let filtered = pamData.filter(p => p.periodeStart <= endDate && p.periodeEnd >= startDate);
+        
+        let totalVolume = filtered.reduce((sum, p) => sum + (p.volume || 0), 0);
+        let totalBiaya = totalVolume * (master.hargaPerM3 || 5000);
+        
+        document.getElementById('pamTotalVolume').innerHTML = totalVolume.toLocaleString() + ' m³';
+        document.getElementById('pamTotalBiaya').innerHTML = 'Rp ' + totalBiaya.toLocaleString();
+        document.getElementById('pamHargaM3').innerHTML = 'Rp ' + (master.hargaPerM3 || 5000).toLocaleString() + ' /m³';
+        document.getElementById('pamLastUpdate').innerHTML = 'Last Update: ' + (master.lastUpdate ? new Date(master.lastUpdate).toLocaleDateString('id-ID') : '-');
+        
+        let currentYear = new Date().getFullYear();
+        let monthlyVolume = {};
+        
+        for (let i = 1; i <= 12; i++) {
+            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
+            monthlyVolume[monthKey] = 0;
+        }
+        
+        filtered.forEach(p => {
+            let startYear = parseInt(p.periodeStart.substring(0,4));
+            if (startYear === currentYear) {
+                let monthKey = p.periodeStart.substring(0,7);
+                if (monthlyVolume[monthKey] !== undefined) {
+                    monthlyVolume[monthKey] += p.volume || 0;
+                }
+            }
+        });
+        
+        let monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        let monthlyValues = [];
+        for (let i = 1; i <= 12; i++) {
+            let monthKey = `${currentYear}-${i.toString().padStart(2, '0')}`;
+            monthlyValues.push(monthlyVolume[monthKey] || 0);
+        }
+        
+        if (pamMonthlyTrendChart) pamMonthlyTrendChart.destroy();
+        let ctx = document.getElementById('pamMonthlyTrendChart').getContext('2d');
+        pamMonthlyTrendChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: monthNames, datasets: [{ label: 'Volume Air (m³)', data: monthlyValues, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)', tension: 0.3, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { datalabels: { anchor: 'end', align: 'top', formatter: (val) => val > 0 ? val.toLocaleString() + ' m³' : '' } } }
+        });
+    }
+
+    function resetPamFilter() {
+        const range = getCurrentMonthRange();
+        document.getElementById('pamFilterStart').value = range.start;
+        document.getElementById('pamFilterEnd').value = range.end;
+        updatePamCharts();
+    }
+
     function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
     // ============ CRUD FUNCTIONS ============
