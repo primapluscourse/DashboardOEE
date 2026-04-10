@@ -71,10 +71,16 @@
         .sub-card-title { font-size: 14px; font-weight: 600; color: #1e5c3c; margin-bottom: 12px; }
         .form-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 10px; }
         .form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 10px; }
-        .form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 10px; }
-        @media (max-width: 768px) { .form-row-2, .form-row-3, .form-row-4 { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .form-row-2, .form-row-3 { grid-template-columns: 1fr; } }
         .preview-total { background: #d4edda; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; margin-top: 15px; }
         .rumus-info { font-size: 11px; color: #6c757d; margin-top: 4px; font-style: italic; }
+        .footer { background: white; border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .footer-left h3 { color: #1e5c3c; margin-bottom: 5px; font-size: 16px; }
+        .footer-left p { color: #6c757d; font-size: 12px; }
+        .footer-center p { font-size: 12px; color: #495057; }
+        .footer-right p { font-size: 11px; color: #adb5bd; }
+        @media (max-width: 768px) { .footer-content { flex-direction: column; text-align: center; } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
@@ -226,14 +232,14 @@
             </div>
         </div>
 
-        <!-- Input LISTRIK - MANUAL SEMUA -->
+        <!-- Input LISTRIK -->
         <div id="input-listrik" class="input-panel">
             <div class="card">
                 <div class="card-title">⚡ INPUT PEMAKAIAN LISTRIK</div>
-                <div class="info-hitung">📌 Format input sesuai contoh: <br>
-                • Mixing: kWh × Jumlah Blend <br>
-                • Transfer: Screw kWh + Blend kWh <br>
-                • Filling Line: kWh × Jam Aktif <br>
+                <div class="info-hitung">📌 Format input sesuai rumus:<br>
+                • Mixing: kWh × Jumlah Blend<br>
+                • Transfer: Screw kWh + Blend kWh<br>
+                • Filling Line: kWh × Jam Aktif<br>
                 • Utility: kWh × Jam Aktif
                 </div>
                 
@@ -242,7 +248,7 @@
                     <div class="form-group"><label>📅 Periode End</label><input type="date" id="listrikEnd"></div>
                 </div>
 
-                <!-- MIXING REBORN -->
+                <!-- MIXING -->
                 <div class="sub-card">
                     <div class="sub-card-title">🥣 MIXING REBORN</div>
                     <div class="form-row-3">
@@ -253,7 +259,7 @@
                     <div class="rumus-info">📐 Rumus: kWh × Jumlah Blend</div>
                 </div>
 
-                <!-- SCREW TRANSFER & BLEND TRANSFER -->
+                <!-- TRANSFER -->
                 <div class="sub-card">
                     <div class="sub-card-title">🔄 SCREW TRANSFER & BLEND TRANSFER</div>
                     <div class="form-row-3">
@@ -264,7 +270,7 @@
                     <div class="rumus-info">📐 Rumus: Screw kWh + Blend kWh</div>
                 </div>
 
-                <!-- FILLING LINE 1 (Seasoning) -->
+                <!-- FILLING LINE 1 -->
                 <div class="sub-card">
                     <div class="sub-card-title">🥫 FILLING LINE 1 (Seasoning)</div>
                     <div class="form-row-3">
@@ -275,7 +281,7 @@
                     <div class="rumus-info">📐 Rumus: kWh × Jam Aktif</div>
                 </div>
 
-                <!-- FILLING LINE 2 (Kaldu) -->
+                <!-- FILLING LINE 2 -->
                 <div class="sub-card">
                     <div class="sub-card-title">🍲 FILLING LINE 2 (Kaldu)</div>
                     <div class="form-row-3">
@@ -289,7 +295,6 @@
                 <!-- UTILITY -->
                 <div class="section-title">⚙️ UTILITY</div>
                 
-                <!-- HVAC -->
                 <div class="sub-card">
                     <div class="sub-card-title">❄️ HVAC</div>
                     <div class="form-row-3">
@@ -300,7 +305,6 @@
                     <div class="rumus-info">📐 Rumus: kWh × Jam Aktif</div>
                 </div>
 
-                <!-- Kompresor -->
                 <div class="sub-card">
                     <div class="sub-card-title">🔄 Kompresor</div>
                     <div class="form-row-3">
@@ -360,11 +364,35 @@
             <div class="data-table" id="auditList"></div>
         </div>
     </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <h3>PT ALAM MUSTIKA HIJAU</h3>
+                <p>Digital Monitoring System OEE & Utility</p>
+                <p style="margin-top: 5px;">© 2025 - All Rights Reserved</p>
+            </div>
+            <div class="footer-center">
+                <p>📊 Real-time Monitoring</p>
+                <p>⚡ Listrik & 💧 PAM</p>
+                <p>🏭 OEE Production</p>
+            </div>
+            <div class="footer-right">
+                <p>Version 1.0</p>
+                <p>Last Update: <span id="footerDate"></span></p>
+                <p>Developed with ❤️</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     Chart.register(ChartDataLabels);
     Chart.defaults.set('plugins.datalabels', { color: '#1e5c3c', anchor: 'end', align: 'top', offset: 4, font: { weight: 'bold', size: 11 } });
+    
+    // Set footer date
+    document.getElementById('footerDate').innerText = new Date().toLocaleDateString('id-ID');
     
     let oeeMonthlyChart, downtimeDailyChart, listrikMonthlyTrendChart, listrikMesinTrendChart, listrikUtilityTrendChart, listrikKomponenChart, pamMonthlyTrendChart;
     
@@ -383,39 +411,33 @@
         document.getElementById('filterEndDate').value = range.end; 
     }
     
-    // Update Preview Listrik (otomatis berdasarkan rumus)
+    // Update Preview Listrik
     function updateListrikPreview() {
-        // Mixing: kWh × Jumlah Blend
         let mixingKwh = parseFloat(document.getElementById('mixingKwh').value) || 0;
         let jumlahBlend = parseFloat(document.getElementById('jumlahBlend').value) || 0;
         let totalMixing = mixingKwh * jumlahBlend;
         document.getElementById('totalKwhMixing').value = totalMixing.toFixed(2);
         
-        // Transfer: Screw + Blend
         let screwKwh = parseFloat(document.getElementById('screwTransferKwh').value) || 0;
         let blendKwh = parseFloat(document.getElementById('blendTransferKwh').value) || 0;
         let totalTransfer = screwKwh + blendKwh;
         document.getElementById('totalKwhTransfer').value = totalTransfer.toFixed(2);
         
-        // Filling Line 1: kWh × Jam
         let filling1Kwh = parseFloat(document.getElementById('filling1Kwh').value) || 0;
         let line1Jam = parseFloat(document.getElementById('lamaAktifLine1').value) || 0;
         let totalLine1 = filling1Kwh * line1Jam;
         document.getElementById('totalKwhLine1').value = totalLine1.toFixed(2);
         
-        // Filling Line 2: kWh × Jam
         let filling2Kwh = parseFloat(document.getElementById('filling2Kwh').value) || 0;
         let line2Jam = parseFloat(document.getElementById('lamaAktifLine2').value) || 0;
         let totalLine2 = filling2Kwh * line2Jam;
         document.getElementById('totalKwhLine2').value = totalLine2.toFixed(2);
         
-        // HVAC: kWh × Jam
         let hvacKwh = parseFloat(document.getElementById('hvacKwh').value) || 0;
         let hvacJam = parseFloat(document.getElementById('hvacJam').value) || 0;
         let totalHvac = hvacKwh * hvacJam;
         document.getElementById('totalKwhHvac').value = totalHvac.toFixed(2);
         
-        // Kompresor: kWh × Jam
         let kompresorKwh = parseFloat(document.getElementById('kompresorKwh').value) || 0;
         let kompresorJam = parseFloat(document.getElementById('kompresorJam').value) || 0;
         let totalKompresor = kompresorKwh * kompresorJam;
@@ -426,7 +448,7 @@
         <small>🏭 Mixing: ${totalMixing.toFixed(2)} | Transfer: ${totalTransfer.toFixed(2)} | Line1: ${totalLine1.toFixed(2)} | Line2: ${totalLine2.toFixed(2)} | HVAC: ${totalHvac.toFixed(2)} | Kompresor: ${totalKompresor.toFixed(2)}</small>`;
     }
     
-    // Event listeners untuk semua input
+    // Event listeners
     const listrikInputs = ['mixingKwh', 'jumlahBlend', 'screwTransferKwh', 'blendTransferKwh', 
                            'filling1Kwh', 'lamaAktifLine1', 'filling2Kwh', 'lamaAktifLine2',
                            'hvacKwh', 'hvacJam', 'kompresorKwh', 'kompresorJam'];
@@ -807,7 +829,6 @@
         loadListrikList(); 
         updateDashboard();
         
-        // Reset form
         listrikInputs.forEach(id => document.getElementById(id).value = '');
         updateListrikPreview();
     }
@@ -912,7 +933,7 @@
     
     function loadAuditList() { 
         let audit = JSON.parse(localStorage.getItem('auditTrail') || '[]'); 
-        let html = '<thead><tr><th>Tanggal</th><th>Jenis</th><th>Nilai Lama</th><th>Nilai Baru</th><th>Keterangan</th><th>User</th></tr></thead><tbody>';
+        let html = '<thead><tr><th>Tanggal</th><th>Jenis</th><th>Nilai Lama</th><th>Nilai Baru</th><th>Keterangan</th><th>User</th><tr></thead><tbody>';
         audit.forEach(a => { 
             html += `<tr>
                 <td>${a.tanggal}</td>
